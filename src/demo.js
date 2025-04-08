@@ -8,4 +8,5 @@ function resizeCanvas() {
 window.addEventListener("resize", resizeCanvas)
 resizeCanvas()
 
-window.mymap = new GLMap(canvas)
+let m = new GLMap(canvas)
+m.test()

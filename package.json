@@ -1,0 +1,14 @@
+{
+	"name": "glmap",
+	"version": "0.0.0",
+	"type": "module",
+	"browser": "dist/glmap.js",
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build",
+		"prev": "vite preview --host"
+	},
+	"devDependencies": {
+		"vite": "^6.2.3"
+	}
+}

@@ -19,9 +19,9 @@ void main() {
 
 	float scale = pow(2.0, gridZoomLevel - tileZoomLevel);
 
-	vec2 gridCoordinate = (vertexPos + tileOffset - gridCenter) * scale;
+	vec2 gridCoordinate = (vertexPos + tileOffset) * scale - gridCenter;
 
-	vec2 clipSpace = gridCoordinate * vec2(1,-1) / gridSize;
+	vec2 clipSpace = gridCoordinate * vec2(2,-2) / gridSize;
 	
 	gl_Position = vec4(clipSpace, tileZoomLevel / -1000.0, 1);
 }

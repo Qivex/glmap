@@ -23,5 +23,5 @@ void main() {
 
 	vec2 clipSpace = gridCoordinate * vec2(2,-2) / gridSize;
 	
-	gl_Position = vec4(clipSpace, tileZoomLevel / -1000.0, 1);
+	gl_Position = vec4(clipSpace, 0.9999 - tileZoomLevel / 16.0, 1);
 }

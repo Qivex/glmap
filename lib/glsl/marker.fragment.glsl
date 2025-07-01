@@ -3,13 +3,13 @@
 precision highp float;
 precision highp sampler2DArray;
 
-uniform sampler2DArray tiles;
+uniform sampler2DArray icons;
 
 in vec2 uv;
-in float sliceID;
+in float w;
 
 out vec4 color;
 
 void main() {
-	color = texture(tiles, vec3(uv, sliceID));
+	color = texture(icons, vec3(uv, w));
 }

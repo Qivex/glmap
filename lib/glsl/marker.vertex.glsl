@@ -19,7 +19,7 @@ void main() {
 	// Texture coordinates
 	uv = vertexPos;
 	w = iconIndex;
-	// Vertext position
+	// Vertex position
 	vec2 centerOffset = (markerPos - center) * pow(2.0, zoom);
 	vec2 cornerOffset = vertexPos * iconSize - iconAnchor;
 	vec2 normalized = (centerOffset + cornerOffset) * vec2(2, -2) / resolution;

@@ -9,4 +9,6 @@ window.addEventListener("resize", resizeCanvas)
 resizeCanvas()
 
 let m = new GLMap(canvas)
-m.test()
+m.testTiles()
+// TEMP: Disabled markers, because for some reason both programs interact -> Find missing activate() before enabling again
+//m.testMarker()

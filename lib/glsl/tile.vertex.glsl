@@ -11,12 +11,15 @@ uniform float zoom;
 
 in vec2 vertexPos;
 in vec3 tilePos;
+in float tileIndex;
 
 out vec2 uv;
+out float w;
 
 void main() {
 	// Texture coordinates
 	uv = vertexPos;
+	w = tileIndex;
 	// Vertex position
 	float tileScale = pow(2.0, zoom - tilePos.z);   // Scaling for tiles of other zoom
 	vec2 gridPos = (tilePos.xy + vertexPos) * tileScale; // Location on the grid

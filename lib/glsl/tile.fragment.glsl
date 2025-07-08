@@ -1,14 +1,15 @@
 #version 300 es
 
 precision highp float;
-precision highp sampler2D;
+precision highp sampler2DArray;
 
-uniform sampler2D tile;
+uniform sampler2DArray tiles;
 
 in vec2 uv;
+in float w;
 
 out vec4 color;
 
 void main() {
-	color = texture(tile, uv);
+	color = texture(tiles, vec3(uv, w));
 }

@@ -4,6 +4,25 @@ import vs from "../glsl/tile.vertex.glsl?raw"
 import fs from "../glsl/tile.fragment.glsl?raw"
 
 class TileProgram extends ShaderProgram {
+	resolutionUniformLocation: WebGLUniformLocation | null
+	tileSizeUniformLocation: WebGLUniformLocation | null
+	centerUniformLocation: WebGLUniformLocation | null
+	zoomUniformLocation: WebGLUniformLocation | null
+
+	vertexPosAttributeLocation: number
+	tilePosAttributeLocation: number
+	tileIndexAttributeLocation: number
+
+	attributeArray: WebGLVertexArrayObject | null
+
+	vertexBuffer: WebGLBuffer | null
+	tilePosBuffer: WebGLBuffer | null
+	tileIndexBuffer: WebGLBuffer | null
+
+	tileCount = 0
+	texture: WebGLTexture
+
+
 	constructor(context: WebGL2RenderingContext) {
 		super(context)
 		this.compile(vs, fs)
@@ -46,30 +65,30 @@ class TileProgram extends ShaderProgram {
 	}
 
 	// Uniform setter
-	setResolution(width, height) {
+	setResolution(width: number, height: number) {
 		this.context.uniform2f(this.resolutionUniformLocation, width, height)
 	}
 
-	setTileSize(width, height) {
+	setTileSize(width: number, height: number) {
 		this.context.uniform2f(this.tileSizeUniformLocation, width, height)
 	}
 
-	setCenter(x, y) {
+	setCenter(x: number, y: number) {
 		this.context.uniform2f(this.centerUniformLocation, x, y)
 	}
 
-	setZoom(zoom) {
+	setZoom(zoom: number) {
 		this.context.uniform1f(this.zoomUniformLocation, zoom)
 	}
 
 	// Attribute buffer setter
-	setTilePositions(positions) {
+	setTilePositions(positions: Array<number>) {
 		let gl = this.context
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.tilePosBuffer)
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW)
 	}
 
-	setTileIndexes(indexes) {
+	setTileIndexes(indexes: Array<number>) {
 		this.tileCount = indexes.length
 		let gl = this.context
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.tileIndexBuffer)
@@ -77,7 +96,7 @@ class TileProgram extends ShaderProgram {
 	}
 
 	// Store texture
-	setTileTexture(texture) {
+	setTileTexture(texture: WebGLTexture) {
 		this.texture = texture
 	}
 

@@ -9,7 +9,8 @@ class ZoomInteraction extends UserInteraction {
 
 	enableFor(glmap: GLMap) {
 		let canvasElement = glmap.getCanvasElement()
-		canvasElement.addEventListener("wheel", (wheelEvent: WheelEvent) => {
+		canvasElement.addEventListener("wheel", (event: Event) => {
+			const wheelEvent = event as WheelEvent
 			wheelEvent.preventDefault()	// Prevent scrolling of body, "go back" etc.
 
 			let currentZoom = glmap.getZoom()

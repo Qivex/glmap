@@ -7,7 +7,11 @@ import { PanInteraction } from "./interactions/PanInteraction"
 import { ZoomInteraction } from "./interactions/ZoomInteraction"
 
 class SimpleGLMap extends GLMap {
-	constructor(canvasElement) {
+	tileLayer: TileLayer
+	markerLayer: MarkerLayer
+
+
+	constructor(canvasElement: HTMLCanvasElement) {
 		super(canvasElement)
 		// TEMP: Extracted into test*() functions to enable/disable easily in demo.js
 
@@ -39,6 +43,8 @@ class SimpleGLMap extends GLMap {
 		// Create icons
 		let canvas = new OffscreenCanvas(32, 32)
 		let ctx = canvas.getContext("2d")
+		if (ctx === null)
+			throw new Error("Context creation failed")
 
 		// Should be [0,1,2]
 		let icons = ["red", "lime", "blue", "yellow", "purple", "black"].map(color => {
@@ -69,7 +75,7 @@ class SimpleGLMap extends GLMap {
 		this.addUserInteraction(new ZoomInteraction(this))
 	}
 
-	render(time) {
+	render(time: number) {
 		//this.setZoom(1.5 * Math.sin(time / 1000) + 5.5)
 		super.render(time)
 	}

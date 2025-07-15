@@ -3,51 +3,65 @@ import { MarkerProgram } from "../programs/MarkerProgram"
 import { IconStorage } from "../storage/IconStorage"
 
 
-class MarkerLayer extends MapLayer {
-	constructor(config) {
-		super(config)
+type MarkerLayerConfig = {
+	context: WebGL2RenderingContext,
+	maxIconWidth: number,
+	maxIconHeight: number,
+	maxIconCount: number
+}
 
-		// Read from config
-		this.maxIconWidth = config.maxIconWidth
-		this.maxIconHeight = config.maxIconHeight
-		this.maxIconCount = config.maxIconCount
+
+class MarkerLayer extends MapLayer {
+	markerProgram: MarkerProgram
+	iconStorage: IconStorage
+
+	defaultIconIndex = 0
+
+	markerIndexes: Array<number> = []
+	markerLatLngs: Array<number> = []
+
+	hasUpdatedMarkers = false
+
+	constructor(config: MarkerLayerConfig) {
+		super()
+
+		const {
+			context,
+			maxIconWidth,
+			maxIconHeight,
+			maxIconCount
+		} = config
 
 		// Setup shader program
-		let mp = new MarkerProgram(config.context)
+		let mp = new MarkerProgram(context)
 		this.markerProgram = mp
 		
 		// Create texture storage for icons
-		this.iconStorage = new IconStorage(config.context, this.maxIconCount, this.maxIconWidth, this.maxIconHeight)
+		this.iconStorage = new IconStorage(context, maxIconCount, maxIconWidth, maxIconHeight)
 		mp.setMarkerTexture(this.iconStorage.getTextureBinding())	// Should never change
-
-		this.defaultIconIndex = 0
-
-		// Store marker data
-		this.markerIndexes = []
-		this.markerLatLngs = []
 	}
 
-	onPan(x, y) {
+	onPan(x: number, y: number) {
 		this.markerProgram.activate()
 		this.markerProgram.setCenter(x, y)
 	}
 
-	onZoom(z) {
+	onZoom(z: number) {
 		this.markerProgram.activate()
 		this.markerProgram.setZoom(z)
 	}
 
-	onResize(w, h) {
+	onResize(w: number, h: number) {
 		this.markerProgram.activate()
 		this.markerProgram.setResolution(w, h)
 	}
 
-	createIcon(image, width, height, anchorX, anchorY) {
+	createIcon(image: CanvasImageSource, width: number, height: number, anchorX: number, anchorY: number) {
 		let iconIndex = this.iconStorage.createIcon(image, width, height, anchorX, anchorY)
 		return iconIndex	// Todo: Wrap this with class which has wrapper functions to get/set values
 	}
 
-	addMarker(lat, lng, iconIndex) {
+	addMarker(lat: number, lng: number, iconIndex: number) {
 		this.hasUpdatedMarkers = true
 
 		if (typeof iconIndex != "number")
@@ -58,7 +72,7 @@ class MarkerLayer extends MapLayer {
 		// Todo: Same as with Icon, use wrapper class for ref when removing is required
 	}
 
-	render(time) {
+	render(time: number) {
 		let mp = this.markerProgram
 		mp.activate()
 

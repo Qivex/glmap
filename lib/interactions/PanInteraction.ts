@@ -9,11 +9,13 @@ class PanInteraction extends UserInteraction {
 
 	enableFor(glmap: GLMap) {
 		let canvasElement = glmap.getCanvasElement()
-		canvasElement.addEventListener("pointerdown", (downEvent: PointerEvent) => {
+		canvasElement.addEventListener("pointerdown", (event: Event)  => {
+			const downEvent = event as PointerEvent
 			// This location of initial pointerdown is set to remain "under" the pointer during the pan
 			let targetPointerCoord = glmap.canvas2map(downEvent.offsetX, downEvent.offsetY)
 
-			function onDrag(moveEvent: PointerEvent) {
+			function onDrag(event: Event) {
+				const moveEvent = event as MouseEvent
 				let currentPointerCoord = glmap.canvas2map(moveEvent.offsetX, moveEvent.offsetY)
 
 				// Required shift for pointer to point at target again

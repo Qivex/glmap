@@ -1,8 +1,7 @@
 class CanvasContext {
-	constructor(canvasElement) {
-		if (!(canvasElement instanceof HTMLCanvasElement) && !(canvasElement instanceof OffscreenCanvas))
-			throw new Error("Provided element is not a suitable canvas!")
+	context: WebGL2RenderingContext
 
+	constructor(canvasElement: HTMLCanvasElement) {
 		// Obtain rendering context
 		let gl = canvasElement.getContext("webgl2")
 		if (gl === null)

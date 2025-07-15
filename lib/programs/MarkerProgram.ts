@@ -4,6 +4,27 @@ import vs from "../glsl/marker.vertex.glsl?raw"
 import fs from "../glsl/marker.fragment.glsl?raw"
 
 class MarkerProgram extends ShaderProgram {
+	resolutionUniformLocation: WebGLUniformLocation | null
+	centerUniformLocation: WebGLUniformLocation | null
+	zoomUniformLocation: WebGLUniformLocation | null
+
+	vertexPosAttributeLocation: number
+	markerPosAttributeLocation: number
+	iconSizeAttributeLocation: number
+	iconAnchorAttributeLocation: number
+	iconIndexAttributeLocation: number
+
+	attributeArray: WebGLVertexArrayObject | null
+
+	vertexBuffer: WebGLBuffer | null
+	markerBuffer: WebGLBuffer | null
+	sizeBuffer: WebGLBuffer | null
+	anchorBuffer: WebGLBuffer | null
+	indexBuffer: WebGLBuffer | null
+
+	markerCount = 0
+	texture: WebGLTexture
+
 	constructor(context: WebGL2RenderingContext) {
 		super(context)
 		this.compile(vs, fs)
@@ -59,46 +80,46 @@ class MarkerProgram extends ShaderProgram {
 	}
 
 	// Uniform setter
-	setResolution(width, height) {
+	setResolution(width: number, height: number) {
 		this.context.uniform2f(this.resolutionUniformLocation, width, height)
 	}
 
-	setCenter(x, y) {
+	setCenter(x: number, y: number) {
 		this.context.uniform2f(this.centerUniformLocation, x, y)
 	}
 
-	setZoom(zoom) {
+	setZoom(zoom: number) {
 		this.context.uniform1f(this.zoomUniformLocation, zoom)
 	}
 
 	// Attribute buffer setter
-	setMarkerCoordinates(coords) {
+	setMarkerCoordinates(coords: Array<number>) {
 		this.markerCount = coords.length / 2
 		let gl = this.context
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.markerBuffer)
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(coords), gl.STATIC_DRAW)
 	}
 
-	setMarkerSizes(sizes) {
+	setMarkerSizes(sizes: Array<number>) {
 		let gl = this.context
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.sizeBuffer)
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(sizes), gl.STATIC_DRAW)
 	}
 
-	setMarkerAnchors(anchors) {
+	setMarkerAnchors(anchors: Array<number>) {
 		let gl = this.context
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.anchorBuffer)
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(anchors), gl.STATIC_DRAW)
 	}
 
-	setMarkerIcons(indexes) {
+	setMarkerIcons(indexes: Array<number>) {
 		let gl = this.context
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.indexBuffer)
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(indexes), gl.STATIC_DRAW)
 	}
 
 	// Store texture
-	setMarkerTexture(texture) {
+	setMarkerTexture(texture: WebGLTexture) {
 		this.texture = texture
 	}	
 

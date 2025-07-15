@@ -1,26 +1,32 @@
 import { CanvasContext } from "./CanvasContext"
 
+import type { UserInteraction } from "./interactions/UserInteraction"
+import type { MapLayer } from "./layers/MapLayer"
+
 class GLMap extends CanvasContext {
-	constructor(canvasElement) {
+	layers: Array<MapLayer> = []
+	interactions: Array<UserInteraction> = []
+
+	centerX = 0
+	centerY = 0
+	zoom = 0
+	resolutionWidth: number
+	resolutionHeight: number
+
+	constructor(canvasElement: HTMLCanvasElement) {
 		super(canvasElement)
 
-		this.layers = []
-		this.interactions = []
-
-		this.centerX = 0
-		this.centerY = 0
-		this.zoom = 0
 		this.resolutionWidth = this.context.drawingBufferWidth
 		this.resolutionHeight =  this.context.drawingBufferHeight
 
-		let render = (time) => {
+		let render = (time: number) => {
 			this.render(time)
 			requestAnimationFrame(render)
 		}
 		render(0)
 	}
 
-	addMapLayer(layer) {
+	addMapLayer(layer: MapLayer) {
 		this.layers.push(layer)
 		// Send initial state (processed before first render)
 		layer.onPan(this.centerX, this.centerY)
@@ -28,12 +34,12 @@ class GLMap extends CanvasContext {
 		layer.onResize(this.resolutionWidth, this.resolutionHeight)
 	}
 
-	addUserInteraction(interaction) {
+	addUserInteraction(interaction: UserInteraction) {
 		interaction.enableFor(this)
 		this.interactions.push(interaction)
 	}
 
-	setCenter(x, y) {
+	setCenter(x: number, y: number) {
 		this.centerX = x
 		this.centerY = y
 		for (let layer of this.layers) {
@@ -45,7 +51,7 @@ class GLMap extends CanvasContext {
 		return {x: this.centerX, y: this.centerY}
 	}
 
-	setZoom(zoom) {
+	setZoom(zoom: number) {
 		this.zoom = zoom
 		for (let layer of this.layers) {
 			layer.onZoom(zoom)
@@ -56,7 +62,7 @@ class GLMap extends CanvasContext {
 		return this.zoom
 	}
 
-	canvas2map(canvasX, canvasY) {
+	canvas2map(canvasX: number, canvasY: number) {
 		let canvasCenterX = this.resolutionWidth  / 2,	// Todo: Wrong with resolution other than native
 			canvasCenterY = this.resolutionHeight / 2
 		let offsetX = canvasX - canvasCenterX,	// Fix: canvasX * (this.resolutionWidth / this.getCanvasElement().clientWidth) - canvasCenterX
@@ -68,7 +74,7 @@ class GLMap extends CanvasContext {
 		}
 	}
 
-	render(time) {
+	render(time: number) {
 		let gl = this.context
 
 		let w = gl.drawingBufferWidth,

@@ -1,13 +1,15 @@
-class MapLayer {
+abstract class MapLayer {
 	constructor() {
 		// Calculations for padding & offset
 	}
 
-	onPan(newCenterX, newCenterY) {}
+	abstract onPan(newCenterX: number, newCenterY: number): void
 
-	onZoom(newZoom) {}
+	abstract onZoom(newZoom: number): void
 
-	onResize(newWidth, newHeight) {}
+	abstract onResize(newWidth: number, newHeight: number): void
+
+	abstract render(time: number): void
 }
 
 export { MapLayer }

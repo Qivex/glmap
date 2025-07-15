@@ -5,10 +5,11 @@
 	"browser": "dist/glmap.js",
 	"scripts": {
 		"dev": "vite",
-		"build": "vite build",
+		"build": "tsc && vite build",
 		"prev": "vite preview --host"
 	},
 	"devDependencies": {
-		"vite": "^6.2.3"
+		"vite": "^6.2.3",
+		"typescript": "^5.8.3"
 	}
 }

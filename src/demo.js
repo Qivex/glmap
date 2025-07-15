@@ -1,4 +1,4 @@
-import { GLMap } from "/lib/main.js"
+import { GLMap } from "/lib/main.ts"
 
 function resizeCanvas() {
 	canvas.width = canvas.clientWidth

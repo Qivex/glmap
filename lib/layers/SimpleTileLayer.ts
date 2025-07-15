@@ -10,47 +10,76 @@ const PADDING = 0	// Used to fetch tiles outside of viewport (avoid empty tiles)
 
 const MAX_TILE_CREATIONS_PER_FRAME = 8	// Empiric: 256x256 tiles take 1-2ms -> ~8 tiles @ 60fps are usually safe
 
-class TileLayer extends MapLayer {
-	constructor(config) {
-		super(config)
-		
-		this.tileWidth = config.tileWidth
-		this.tileHeight = config.tileHeight
-		this.tileURL = config.tileURL
-			
-		this.tileProgram = new TileProgram(config.context)
-		this.tileSource = new TileSource(this.tileURL)
-		this.tileStorage = new TileStorage(config.context, this.tileWidth, this.tileHeight)
 
-		//TEMP
+type TileLayerConfig = {
+	context: WebGL2RenderingContext,
+	tileWidth?: number,
+	tileHeight?: number,
+	tileURL: string
+}
+
+type TileInfoType = {
+	x: number,
+	y: number,
+	z: number
+}
+
+type QueueItemType = {
+	image: HTMLImageElement,
+	tile: TileInfoType
+}
+
+
+class TileLayer extends MapLayer {
+	tileWidth = 256
+	tileHeight = 256
+
+	tileProgram: TileProgram
+	tileSource: TileSource
+	tileStorage: TileStorage
+
+	hasUpdatedArea = false
+	hasUpdatedTiles = false
+
+	requiredTiles: Array<TileInfoType> = []
+	tileCreateQueue: Array<QueueItemType> = []
+
+	// Required tiles are calculated from these values:
+	// TODO: Into parent class MapLayer - these are required for all layers! Also handle change detection there...
+	centerX = 0
+	centerY = 0
+	zoom = 0
+	width = 1
+	height = 1
+
+	// Current tile grid bounds
+	zoomLevel = 0
+	tileMinX = 0
+	tileMaxX = 0
+	tileMinY = 0
+	tileMaxY = 0
+
+	constructor(config: TileLayerConfig) {
+		super()
+		
+		const {
+			context,
+			tileWidth = 256,
+			tileHeight = 256,
+			tileURL
+		} = config
+		Object.assign(this, {tileWidth, tileHeight})
+			
+		this.tileProgram = new TileProgram(context)
+		this.tileSource = new TileSource(tileURL)
+		this.tileStorage = new TileStorage(context, tileWidth, tileHeight)
+
 		this.tileProgram.activate()
 		this.tileProgram.setTileSize(this.tileWidth, this.tileHeight)
 		this.tileProgram.setTileTexture(this.tileStorage.getTextureBinding())
-
-		this.hasUpdatedArea = false
-		this.hasUpdatedTiles = false
-
-		this.requiredTiles = []
-
-		this.tileCreateQueue = []
-
-		// Required tiles are calculated from these values:
-		// TODO: Into parent class MapLayer - these are required for all layers! Also handle change detection there...
-		this.centerX = 0
-		this.centerY = 0
-		this.zoom = 0
-		this.width = 1
-		this.height = 1
-
-		// Current tile grid bounds
-		this.zoomLevel = 0
-		this.tileMinX = 0
-		this.tileMaxX = 0
-		this.tileMinY = 0
-		this.tileMaxY = 0
 	}
 
-	onPan(newCenterX, newCenterY) {
+	onPan(newCenterX: number, newCenterY: number) {
 		this.hasUpdatedArea = true
 		this.centerX = newCenterX
 		this.centerY = newCenterY
@@ -59,7 +88,7 @@ class TileLayer extends MapLayer {
 		this.tileProgram.setCenter(newCenterX, newCenterY)
 	}
 
-	onZoom(newZoom) {
+	onZoom(newZoom: number) {
 		this.hasUpdatedArea = true
 		this.zoom = newZoom
 		this.zoomLevel = Math.floor(newZoom)
@@ -68,7 +97,7 @@ class TileLayer extends MapLayer {
 		this.tileProgram.setZoom(newZoom)
 	}
 
-	onResize(newWidth, newHeight) {
+	onResize(newWidth: number, newHeight: number) {
 		this.hasUpdatedArea = true
 		this.width = newWidth
 		this.height = newHeight
@@ -77,7 +106,7 @@ class TileLayer extends MapLayer {
 		this.tileProgram.setResolution(newWidth, newHeight)
 	}
 
-	updateTileBounds() {
+	updateTileBounds(): boolean {
 		let gridScale = Math.pow(2, this.zoomLevel)
 		
 		let paddedWidth = this.width / 2 + PADDING
@@ -103,7 +132,7 @@ class TileLayer extends MapLayer {
 		return true
 	}
 
-	getTileBounds() {
+	getTileBounds(): Array<number> {
 		return [
 			this.tileMinX,
 			this.tileMaxX,
@@ -160,7 +189,7 @@ class TileLayer extends MapLayer {
 			}
 	}
 
-	render(time) {
+	render() {
 		if (this.hasUpdatedArea === true) {
 			this.hasUpdatedArea = false
 

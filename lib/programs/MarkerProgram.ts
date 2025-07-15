@@ -1,10 +1,10 @@
-import { ShaderProgram } from "./ShaderProgram";
+import { ShaderProgram } from "./ShaderProgram"
 
 import vs from "../glsl/marker.vertex.glsl?raw"
 import fs from "../glsl/marker.fragment.glsl?raw"
 
 class MarkerProgram extends ShaderProgram {
-	constructor(context) {
+	constructor(context: WebGL2RenderingContext) {
 		super(context)
 		this.compile(vs, fs)
 		let gl = context

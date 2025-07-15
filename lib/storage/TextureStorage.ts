@@ -1,5 +1,17 @@
 class TextureStorage {
-	constructor(gl, maxWidth, maxHeight, maxCount) {
+	context: WebGL2RenderingContext
+
+	maxWidth: number
+	maxHeight: number
+	maxCount: number
+
+	texture: WebGLTexture
+
+	// Track slot usage
+	usedSlots: Array<boolean> = []
+	nextSlot = 0	// Points at lowest empty slot
+
+	constructor(gl: WebGL2RenderingContext, maxWidth: number, maxHeight: number, maxCount: number) {
 		this.context = gl
 
 		// Check dimensions
@@ -14,6 +26,8 @@ class TextureStorage {
 
 		// Create texture array
 		let texture = gl.createTexture()
+		if (texture === null)
+			throw new Error("Texture creation failed")
 		gl.bindTexture(gl.TEXTURE_2D_ARRAY, texture)
 		gl.texImage3D(gl.TEXTURE_2D_ARRAY, 0, gl.RGBA, maxWidth, maxHeight, maxCount, 0, gl.RGBA, gl.UNSIGNED_BYTE, null)
 		gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
@@ -21,17 +35,13 @@ class TextureStorage {
 		gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
 		gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
 		this.texture = texture
-		
-		// Track slot usage
-		this.usedSlots = []
-		this.nextSlot = 0	// Points at lowest empty slot
 	}
 
-	getTextureBinding() {
+	getTextureBinding(): WebGLTexture {
 		return this.texture
 	}
 
-	addTexture(image) {
+	addTexture(image: TexImageSource): number {
 		if (this.nextSlot > this.maxCount)
 			throw Error("TextureStorage is full!")
 
@@ -47,13 +57,13 @@ class TextureStorage {
 		return slot
 	}
 
-	updateTexture(slot, image) {
+	updateTexture(slot: number, image: TexImageSource) {
 		let gl = this.context
 		gl.bindTexture(gl.TEXTURE_2D_ARRAY, this.texture)
 		gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, 0, 0, slot, this.maxWidth, this.maxHeight, 1, gl.RGBA, gl.UNSIGNED_BYTE, image)
 	}
 
-	removeTexture(slot) {
+	removeTexture(slot: number) {
 		this.usedSlots[slot] = false
 
 		if (slot < this.nextSlot)

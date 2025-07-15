@@ -1,28 +1,31 @@
 import { TextureStorage } from "./TextureStorage"
 
-function equalPos(p1, p2) {
+
+type TilePositionType = {x: number, y: number, z: number}
+
+
+function equalPos(p1: TilePositionType, p2: TilePositionType) {
 	return p1 && p2 && p1.x === p2.x && p1.y === p2.y && p1.z === p2.z
 }
 
 class TileStorage extends TextureStorage {
-	constructor(context, tileWidth, tileHeight) {
-		super(context, tileWidth, tileHeight, 128)
+	tilePositions: Array<TilePositionType> = []
 
-		// Store tile positions
-		this.tilePositions = []
+	constructor(context: WebGL2RenderingContext, tileWidth: number, tileHeight: number) {
+		super(context, tileWidth, tileHeight, 128)
 	}
 
-	createTile(image, tile) {
+	createTile(image: TexImageSource, tile: TilePositionType) {
 		let slot = this.addTexture(image)
 		this.tilePositions[slot] = tile
 		return slot
 	}
 
-	findTile(pos) {
+	findTile(pos: TilePositionType) {
 		return this.tilePositions.some(t => equalPos(t, pos))
 	}
 
-	removeTilesExceptRequired(requiredTiles) {
+	removeTilesExceptRequired(requiredTiles: Array<TilePositionType>) {
 		this.tilePositions.forEach((pos, slot) => {
 			if (!requiredTiles.some(r => equalPos(r, pos))) {
 				delete this.tilePositions[slot]
@@ -31,9 +34,9 @@ class TileStorage extends TextureStorage {
 		})
 	}
 
-	constructBufferDataForTiles() {
-		let slices = [],
-			positions = []
+	constructBufferDataForTiles(): {slices: Array<number>, positions: Array<number>} {
+		let slices: Array<number> = [],
+			positions: Array<number> = []
 		
 		this.tilePositions.forEach((p, slot) => {
 			slices.push(slot)

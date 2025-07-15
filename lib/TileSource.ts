@@ -1,43 +1,32 @@
 const templateRegex = /\{(\w)\}/g
 
 
-function createReplaceFunc(lookup) {
+function createReplaceFunc(lookup: ParamLookupType) {
 	// Function will only replace params that are included in lookup
-	return function(match, key) {
+	return function(match: string, key: string) {
 		let value = lookup[key]
 		return value === undefined ? match : value
 	}
 }
 
+type ParamLookupType = {
+	[key: string]: any
+}
+
 class TileSource {
-	constructor(urlTemplate) {
+	template: string
+	tileCache: {[key: string]: HTMLImageElement} = {}
+	params: ParamLookupType = {}
+
+	constructor(urlTemplate: string) {
 		this.template = urlTemplate
-		this.tileCache = {}
-		this.callback = function(t, x, y, z) {
-			console.log(`Tile ${x},${y},${z} was successfully loaded`)
-		}
 	}
 
-	// Called after a tile image was fetched and decoded
-	setCallback(callback) {
-		this.callback = callback
-	}
-
-	requestTiles(xMin, xMax, yMin, yMax, zoom) {
-		for (let x = xMin; x <= xMax; x++) {
-			for (let y = yMin; y <= yMax; y++) {
-				this.fetchTile(x, y, zoom)
-					.then(tile => this.callback(tile, x, y, zoom))
-					.catch(err => {})
-			}
-		}
-	}
-
-	setParams(params) {
+	setParams(params: object) {
 		this.params = params
 	}
 
-	fetchTile(x, y, z) {
+	fetchTile(x: number, y: number, z: number): Promise<HTMLImageElement> {
 		return new Promise((resolve, reject) => {
 			let id = `${x},${y},${z}`
 			let cachedTile = this.tileCache[id]

@@ -1,13 +1,15 @@
+import { GLMap } from "../GLMap"
+
 import { UserInteraction } from "./UserInteraction"
 
 class ZoomInteraction extends UserInteraction {
-	constructor(config) {
+	constructor(config: object) {
 		super(config)
 	}
 
-	enableFor(glmap) {
+	enableFor(glmap: GLMap) {
 		let canvasElement = glmap.getCanvasElement()
-		canvasElement.addEventListener("wheel", (wheelEvent) => {
+		canvasElement.addEventListener("wheel", (wheelEvent: WheelEvent) => {
 			wheelEvent.preventDefault()	// Prevent scrolling of body, "go back" etc.
 
 			let currentZoom = glmap.getZoom()

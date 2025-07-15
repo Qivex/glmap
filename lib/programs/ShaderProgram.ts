@@ -1,18 +1,14 @@
 // Handles compilation of shader code
 class ShaderProgram {
-	constructor(context) {
-		if (!(context instanceof WebGL2RenderingContext))
-			throw new Error("Invalid context!")
+	context: WebGL2RenderingContext
+	program: WebGLProgram
+
+	constructor(context: WebGL2RenderingContext) {
 		this.context = context
 	}
 
-	compile(vertexShaderCode, fragmentShaderCode) {
+	compile(vertexShaderCode: string, fragmentShaderCode: string) {
 		let gl = this.context
-		// Check params
-		if (vertexShaderCode === null)
-			throw new Error("No vertex shader provided!")
-		if (fragmentShaderCode === null)
-			throw new Error("No fragment shader provided!")
 		// Compile code
 		let vertexShader   = this.compileShader(vertexShaderCode,   gl.VERTEX_SHADER)
 		let fragmentShader = this.compileShader(fragmentShaderCode, gl.FRAGMENT_SHADER)
@@ -20,10 +16,12 @@ class ShaderProgram {
 		this.program = this.linkProgram(vertexShader, fragmentShader)
 	}
 
-	compileShader(code, type) {
+	compileShader(code: string, type: number): WebGLShader {
 		let gl = this.context
 		// Setup compilation
 		let shader = gl.createShader(type)
+		if (shader === null)
+			throw new Error("Shader creation failed")
 		gl.shaderSource(shader, code)
 		gl.compileShader(shader)
 		// Check for errors
@@ -35,10 +33,12 @@ class ShaderProgram {
 		return shader
 	}
 
-	linkProgram(vertexShader, fragmentShader) {
+	linkProgram(vertexShader: WebGLShader, fragmentShader: WebGLShader): WebGLProgram {
 		let gl = this.context
 		// Setup linking
 		let program = gl.createProgram()
+		if (program === null)
+			throw new Error("Program creation failed")
 		gl.attachShader(program, vertexShader)
 		gl.attachShader(program, fragmentShader)
 		gl.linkProgram(program)

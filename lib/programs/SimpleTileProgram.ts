@@ -4,7 +4,7 @@ import vs from "../glsl/tile.vertex.glsl?raw"
 import fs from "../glsl/tile.fragment.glsl?raw"
 
 class TileProgram extends ShaderProgram {
-	constructor(context) {
+	constructor(context: WebGL2RenderingContext) {
 		super(context)
 		this.compile(vs, fs)
 		let gl = context

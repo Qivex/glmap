@@ -1,11 +1,13 @@
-class UserInteraction {
-	constructor(config) {
+import { GLMap } from "../GLMap"
+
+abstract class UserInteraction {
+	config: object
+
+	constructor(config: object) {
 		this.config = config
 	}
 
-	enableFor(map) {
-		throw new Error("UserInteraction must implement enableFor(map)")
-	}
+	abstract enableFor(map: GLMap): void
 }
 
 export { UserInteraction }

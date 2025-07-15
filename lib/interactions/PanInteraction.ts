@@ -1,17 +1,19 @@
+import { GLMap } from "../GLMap"
+
 import { UserInteraction } from "./UserInteraction"
 
 class PanInteraction extends UserInteraction {
-	constructor(config) {
+	constructor(config: object) {
 		super(config)
 	}
 
-	enableFor(glmap) {
+	enableFor(glmap: GLMap) {
 		let canvasElement = glmap.getCanvasElement()
-		canvasElement.addEventListener("pointerdown", (downEvent) => {
+		canvasElement.addEventListener("pointerdown", (downEvent: PointerEvent) => {
 			// This location of initial pointerdown is set to remain "under" the pointer during the pan
 			let targetPointerCoord = glmap.canvas2map(downEvent.offsetX, downEvent.offsetY)
 
-			function onDrag(moveEvent) {
+			function onDrag(moveEvent: PointerEvent) {
 				let currentPointerCoord = glmap.canvas2map(moveEvent.offsetX, moveEvent.offsetY)
 
 				// Required shift for pointer to point at target again

@@ -44,14 +44,6 @@ class TileLayer extends MapLayer {
 	requiredTiles: Array<TileInfoType> = []
 	tileCreateQueue: Array<QueueItemType> = []
 
-	// Required tiles are calculated from these values:
-	// TODO: Into parent class MapLayer - these are required for all layers! Also handle change detection there...
-	centerX = 0
-	centerY = 0
-	zoom = 0
-	width = 1
-	height = 1
-
 	// Current tile grid bounds
 	zoomLevel = 0
 	tileMinX = 0
@@ -81,8 +73,6 @@ class TileLayer extends MapLayer {
 
 	onPan(newCenterX: number, newCenterY: number) {
 		this.hasUpdatedArea = true
-		this.centerX = newCenterX
-		this.centerY = newCenterY
 
 		this.tileProgram.activate()
 		this.tileProgram.setCenter(newCenterX, newCenterY)
@@ -90,7 +80,6 @@ class TileLayer extends MapLayer {
 
 	onZoom(newZoom: number) {
 		this.hasUpdatedArea = true
-		this.zoom = newZoom
 		this.zoomLevel = Math.floor(newZoom)
 
 		this.tileProgram.activate()
@@ -99,8 +88,6 @@ class TileLayer extends MapLayer {
 
 	onResize(newWidth: number, newHeight: number) {
 		this.hasUpdatedArea = true
-		this.width = newWidth
-		this.height = newHeight
 
 		this.tileProgram.activate()
 		this.tileProgram.setResolution(newWidth, newHeight)

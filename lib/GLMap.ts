@@ -29,9 +29,9 @@ class GLMap extends CanvasContext {
 	addMapLayer(layer: MapLayer) {
 		this.layers.push(layer)
 		// Send initial state (processed before first render)
-		layer.onPan(this.centerX, this.centerY)
-		layer.onZoom(this.zoom)
-		layer.onResize(this.resolutionWidth, this.resolutionHeight)
+		layer.setCenter(this.centerX, this.centerY)
+		layer.setZoom(this.zoom)
+		layer.setResolution(this.resolutionWidth, this.resolutionHeight)
 	}
 
 	addUserInteraction(interaction: UserInteraction) {
@@ -43,7 +43,7 @@ class GLMap extends CanvasContext {
 		this.centerX = x
 		this.centerY = y
 		for (let layer of this.layers) {
-			layer.onPan(x, y)
+			layer.setCenter(x, y)
 		}
 	}
 
@@ -54,7 +54,7 @@ class GLMap extends CanvasContext {
 	setZoom(zoom: number) {
 		this.zoom = zoom
 		for (let layer of this.layers) {
-			layer.onZoom(zoom)
+			layer.setZoom(zoom)
 		}
 	}
 
@@ -84,7 +84,7 @@ class GLMap extends CanvasContext {
 			this.resolutionWidth = w
 			this.resolutionHeight = h
 			for (let layer of this.layers) {
-				layer.onResize(w, h)
+				layer.setResolution(w, h)
 			}
 		}
 

@@ -24,7 +24,15 @@ class SimpleGLMap extends GLMap {
 			context: this.context,
 			tileWidth: 256,
 			tileHeight: 256,
-			tileURL: "https://s.rsg.sc/sc/images/games/GTAV/map/render/{z}/{x}/{y}.jpg"
+			tileURL: "https://s.rsg.sc/sc/images/games/GTAV/map/render/{z}/{x}/{y}.jpg",
+			tileLimits: {
+				minX: 0,
+				maxX: 128,
+				minY: 0,
+				maxY: 192,
+				minZoom: 0,
+				maxZoom: 7
+			}
 		})
 		this.addMapLayer(this.tileLayer)
 	}

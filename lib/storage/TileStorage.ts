@@ -12,7 +12,7 @@ class TileStorage extends TextureStorage {
 	tilePositions: Array<TilePositionType> = []
 
 	constructor(context: WebGL2RenderingContext, tileWidth: number, tileHeight: number) {
-		super(context, tileWidth, tileHeight, 128)
+		super(context, tileWidth, tileHeight, 256)
 	}
 
 	createTile(image: TexImageSource, tile: TilePositionType) {

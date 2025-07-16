@@ -1,5 +1,9 @@
-const templateRegex = /\{(\w)\}/g
+import type { Lookup } from "./types/types.ts"
 
+type ParamLookupType = Lookup<any>
+
+
+const templateRegex = /\{(\w)\}/g
 
 function createReplaceFunc(lookup: ParamLookupType) {
 	// Function will only replace params that are included in lookup
@@ -9,13 +13,10 @@ function createReplaceFunc(lookup: ParamLookupType) {
 	}
 }
 
-type ParamLookupType = {
-	[key: string]: any
-}
 
 class TileSource {
 	template: string
-	tileCache: {[key: string]: HTMLImageElement} = {}
+	tileCache: Lookup<HTMLImageElement> = {}
 	params: ParamLookupType = {}
 
 	constructor(urlTemplate: string) {

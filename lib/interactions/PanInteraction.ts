@@ -30,9 +30,11 @@ class PanInteraction extends UserInteraction {
 				)
 			}
 
+			canvasElement.style.cursor = "grabbing"
 			canvasElement.addEventListener("pointermove", onDrag)
 
 			canvasElement.addEventListener("pointerup", () => {
+				canvasElement.style.removeProperty("cursor")
 				canvasElement.removeEventListener("pointermove", onDrag)
 			})
 		})

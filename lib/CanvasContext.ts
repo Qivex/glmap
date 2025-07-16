@@ -21,7 +21,7 @@ class CanvasContext {
 	}
 
 	getCanvasElement() {
-		return this.context.canvas
+		return this.context.canvas as HTMLCanvasElement
 	}
 }
 

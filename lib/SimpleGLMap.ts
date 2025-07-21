@@ -5,6 +5,7 @@ import { MarkerLayer } from "./layers/MarkerLayer"
 
 import { PanInteraction } from "./interactions/PanInteraction"
 import { ZoomInteraction } from "./interactions/ZoomInteraction"
+import { HoverInteraction } from "./interactions/HoverInteraction"
 
 class SimpleGLMap extends GLMap {
 	tileLayer: TileLayer
@@ -21,6 +22,7 @@ class SimpleGLMap extends GLMap {
 
 	testTiles() {
 		this.tileLayer = new TileLayer({
+			glmap: this,
 			context: this.context,
 			tileWidth: 256,
 			tileHeight: 256,
@@ -39,6 +41,7 @@ class SimpleGLMap extends GLMap {
 
 	testMarker() {
 		this.markerLayer = new MarkerLayer({
+			glmap: this,
 			context: this.context,
 			maxIconCount: 16,
 			maxIconWidth: 32,
@@ -81,6 +84,10 @@ class SimpleGLMap extends GLMap {
 
 	testZooming() {
 		this.addUserInteraction(new ZoomInteraction(this))
+	}
+
+	testHover() {
+		this.addUserInteraction(new HoverInteraction(this))
 	}
 
 	render(time: number) {

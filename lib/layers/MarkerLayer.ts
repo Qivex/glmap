@@ -2,13 +2,7 @@ import { MapLayer } from "./MapLayer"
 import { MarkerProgram } from "../programs/MarkerProgram"
 import { IconStorage } from "../storage/IconStorage"
 
-
-type MarkerLayerConfig = {
-	context: WebGL2RenderingContext,
-	maxIconWidth: number,
-	maxIconHeight: number,
-	maxIconCount: number
-}
+import type { MarkerLayerConfig } from "../types/types.ts"
 
 
 class MarkerLayer extends MapLayer {
@@ -23,7 +17,7 @@ class MarkerLayer extends MapLayer {
 	hasUpdatedMarkers = false
 
 	constructor(config: MarkerLayerConfig) {
-		super()
+		super(config)
 
 		const {
 			context,
@@ -56,6 +50,33 @@ class MarkerLayer extends MapLayer {
 		this.markerProgram.setResolution(w, h)
 	}
 
+	onClick() {}
+
+	onHover(x: number, y: number) {
+		let m = this.findClosestMarker(x, y)
+		// Check if pointer is actually over icon
+		if (m) {
+			let markerX = this.markerLatLngs[m]
+			let markerY = this.markerLatLngs[m+1]
+
+			let markerCanvasPos = this.glmap.map2canvas(markerX, markerY)
+			let pointerCanvasPos = this.glmap.map2canvas(x, y)
+
+			// TODO: Give choice for hit test: circle, bounding box, alpha != 0 etc. (For now just matching circle)
+			let distancePixels = Math.sqrt(
+				Math.pow(markerCanvasPos.x - pointerCanvasPos.x, 2) +
+				Math.pow(markerCanvasPos.y - pointerCanvasPos.y, 2)
+			)
+
+			let canvasElement = this.glmap.getCanvasElement()
+			if (distancePixels < 16) {
+				canvasElement.style.cursor = "pointer"
+			} else if (canvasElement.style.cursor === "pointer") {
+				canvasElement.style.removeProperty("cursor")
+			}
+		}
+	}
+
 	createIcon(image: CanvasImageSource, width: number, height: number, anchorX: number, anchorY: number) {
 		let iconIndex = this.iconStorage.createIcon(image, width, height, anchorX, anchorY)
 		return iconIndex	// Todo: Wrap this with class which has wrapper functions to get/set values
@@ -70,6 +91,22 @@ class MarkerLayer extends MapLayer {
 		this.markerIndexes.push(iconIndex)
 		this.markerLatLngs.push(lat, lng)
 		// Todo: Same as with Icon, use wrapper class for ref when removing is required
+	}
+
+	findClosestMarker(hitX: number, hitY: number) {
+		let closestIndex = null
+		let closestDistance = Infinity
+		for (let i = 0; i < this.markerLatLngs.length; i += 2) {
+			let x = this.markerLatLngs[i]
+			let y = this.markerLatLngs[i+1]
+			let distance = Math.pow(hitX - x, 2) + Math.pow(hitY - y, 2)	// Omit sqrt until final result, doesnt change order
+			if (distance < closestDistance) {
+				closestDistance = distance
+				closestIndex = i
+			}
+		}
+		//console.log(closestIndex / 2, this.markerLatLngs[closestIndex], this.markerLatLngs[closestIndex + 1])
+		return closestIndex
 	}
 
 	render(time: number) {

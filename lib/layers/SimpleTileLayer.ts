@@ -4,39 +4,14 @@ import { TileProgram } from "../programs/SimpleTileProgram"
 import { TileSource } from "../TileSource"
 import { TileStorage } from "../storage/TileStorage"
 
+import type { TileLayerConfig, TileBoundsType, TilePositionType, QueueItemType } from "../types/types.ts"
+
+
+
 // TODO: From config
 const PADDING = 0	// Used to fetch tiles outside of viewport (avoid empty tiles)
 
 const MAX_TILE_CREATIONS_PER_FRAME = 8	// Empiric: 256x256 tiles take 1-2ms -> ~8 tiles @ 60fps are usually safe
-
-
-type TileLayerConfig = {
-	context: WebGL2RenderingContext,
-	tileWidth?: number,
-	tileHeight?: number,
-	tileURL: string,
-	tileLimits?: TileBoundsType
-}
-
-type TileBoundsType = {
-	minX: number,
-	maxX: number,
-	minY: number,
-	maxY: number,
-	minZoom: number,
-	maxZoom: number
-}
-
-type TileInfoType = {
-	x: number,
-	y: number,
-	z: number
-}
-
-type QueueItemType = {
-	image: HTMLImageElement,
-	tile: TileInfoType
-}
 
 
 function compareTileBounds(t1: TileBoundsType, t2: TileBoundsType) {
@@ -60,14 +35,14 @@ class TileLayer extends MapLayer {
 	hasUpdatedArea = false
 	hasUpdatedTiles = false
 
-	requiredTiles: Array<TileInfoType> = []
+	requiredTiles: Array<TilePositionType> = []
 	tileCreateQueue: Array<QueueItemType> = []
 
 	tileBounds: TileBoundsType = {minX: 0, maxX: 0, minY: 0, maxY: 0, minZoom: 0, maxZoom: 0}	// Tiles for current view
 	tileLimits?: TileBoundsType	// Available tiles
 
 	constructor(config: TileLayerConfig) {
-		super()
+		super(config)
 		
 		const {
 			context,
@@ -107,6 +82,10 @@ class TileLayer extends MapLayer {
 		this.tileProgram.activate()
 		this.tileProgram.setResolution(newWidth, newHeight)
 	}
+
+	// Not required
+	onHover() {}
+	onClick() {}
 
 	updateTileBounds(): boolean {
 		let zoomLevel = Math.floor(this.zoom + 0.5)

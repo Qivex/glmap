@@ -74,6 +74,18 @@ class GLMap extends CanvasContext {
 		}
 	}
 
+	map2canvas(mapX: number, mapY: number) {
+		let canvasCenterX = this.resolutionWidth  / 2,
+			canvasCenterY = this.resolutionHeight / 2
+		let offsetX = mapX - this.centerX,
+			offsetY = mapY - this.centerY
+		let scale = Math.pow(2, this.zoom)
+		return {
+			x: canvasCenterX + scale * offsetX,
+			y: canvasCenterY + scale * offsetY
+		}
+	}
+
 	render(time: number) {
 		let gl = this.context
 

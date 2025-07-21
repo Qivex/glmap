@@ -1,7 +1,6 @@
 import { TextureStorage } from "./TextureStorage"
 
-
-type TilePositionType = {x: number, y: number, z: number}
+import type { TilePositionType } from "../types/types"
 
 
 function equalPos(p1: TilePositionType, p2: TilePositionType) {

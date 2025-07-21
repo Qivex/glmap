@@ -1,13 +1,13 @@
-import { GLMap } from "../GLMap"
+import type { GLMap } from "../GLMap"
 
-abstract class UserInteraction {
-	config: object
+class UserInteraction {
+	glmap: GLMap
 
-	constructor(config: object) {
-		this.config = config
+	constructor() {}
+
+	enableFor(glmap: GLMap) {
+		this.glmap = glmap
 	}
-
-	abstract enableFor(map: GLMap): void
 }
 
 export { UserInteraction }

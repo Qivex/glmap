@@ -1,13 +1,15 @@
-import { GLMap } from "../GLMap"
-
 import { UserInteraction } from "./UserInteraction"
 
+import type { GLMap } from "../GLMap"
+
 class PanInteraction extends UserInteraction {
-	constructor(config: object) {
-		super(config)
+	constructor() {
+		super()
 	}
 
 	enableFor(glmap: GLMap) {
+		super.enableFor(glmap)
+
 		let canvasElement = glmap.getCanvasElement()
 		canvasElement.addEventListener("pointerdown", (event: Event)  => {
 			const downEvent = event as PointerEvent

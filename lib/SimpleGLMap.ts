@@ -6,6 +6,7 @@ import { MarkerLayer } from "./layers/MarkerLayer"
 import { PanInteraction } from "./interactions/PanInteraction"
 import { ZoomInteraction } from "./interactions/ZoomInteraction"
 import { HoverInteraction } from "./interactions/HoverInteraction"
+import { PinchInteraction } from "./interactions/PinchInteraction"
 
 class SimpleGLMap extends GLMap {
 	tileLayer: TileLayer
@@ -79,15 +80,19 @@ class SimpleGLMap extends GLMap {
 	}
 
 	testPanning() {
-		this.addUserInteraction(new PanInteraction(this))
+		this.addUserInteraction(new PanInteraction())
 	}
 
 	testZooming() {
-		this.addUserInteraction(new ZoomInteraction(this))
+		this.addUserInteraction(new ZoomInteraction())
 	}
 
 	testHover() {
-		this.addUserInteraction(new HoverInteraction(this))
+		this.addUserInteraction(new HoverInteraction())
+	}
+
+	testPinch() {
+		this.addUserInteraction(new PinchInteraction())
 	}
 
 	render(time: number) {

@@ -86,7 +86,7 @@ class SimpleGLMap extends GLMap {
 	testPopup() {
 		this.popupLayer = new PopupLayer({
 			glmap: this,
-			context: this.context,
+			context: this.context
 		})
 		this.addMapLayer(this.popupLayer)
 

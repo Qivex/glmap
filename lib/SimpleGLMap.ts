@@ -1,6 +1,6 @@
 import { GLMap } from "./GLMap"
 
-import { TileLayer } from "./layers/SimpleTileLayer"
+import { TileLayer } from "./layers/TileLayer"
 import { MarkerLayer } from "./layers/MarkerLayer"
 import { PopupLayer } from "./layers/PopupLayer"
 

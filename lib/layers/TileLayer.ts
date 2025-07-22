@@ -1,8 +1,8 @@
-import { MapLayer } from "./MapLayer"
+import { MapLayer } from "./MapLayer.ts"
 
-import { TileProgram } from "../programs/SimpleTileProgram"
-import { TileSource } from "../TileSource"
-import { TileStorage } from "../storage/TileStorage"
+import { TileProgram } from "../programs/SimpleTileProgram.ts"
+import { TileSource } from "../TileSource.ts"
+import { TileStorage } from "../storage/TileStorage.ts"
 
 import type { TileLayerConfig, TileBoundsType, TilePositionType, QueueItemType } from "../types/types.ts"
 

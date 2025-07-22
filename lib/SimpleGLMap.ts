@@ -2,6 +2,9 @@ import { GLMap } from "./GLMap"
 
 import { TileLayer } from "./layers/SimpleTileLayer"
 import { MarkerLayer } from "./layers/MarkerLayer"
+import { PopupLayer } from "./layers/PopupLayer"
+
+import { Popup } from "./Popup"
 
 import { PanInteraction } from "./interactions/PanInteraction"
 import { ZoomInteraction } from "./interactions/ZoomInteraction"
@@ -11,6 +14,7 @@ import { PinchInteraction } from "./interactions/PinchInteraction"
 class SimpleGLMap extends GLMap {
 	tileLayer: TileLayer
 	markerLayer: MarkerLayer
+	popupLayer: PopupLayer
 
 
 	constructor(canvasElement: HTMLCanvasElement) {
@@ -77,6 +81,18 @@ class SimpleGLMap extends GLMap {
 				ml.addMarker(x+32, y+96, Math.floor((Math.random() * 6)))
 			}
 		}
+	}
+
+	testPopup() {
+		this.popupLayer = new PopupLayer({
+			glmap: this,
+			context: this.context,
+		})
+		this.addMapLayer(this.popupLayer)
+
+		let testPopup = new Popup(document.getElementById("popup"), 50, 25)
+		testPopup.showAt(64, 128)
+		this.popupLayer.addPopup(testPopup)
 	}
 
 	testPanning() {

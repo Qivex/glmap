@@ -4,15 +4,15 @@ import { IconStorage } from "../storage/IconStorage"
 
 import type { MarkerLayerConfig } from "../types/types.ts"
 
+import { Icon } from "../wrapper/Icon"
+import type { Marker } from "../wrapper/Marker"
+
 
 class MarkerLayer extends MapLayer {
 	markerProgram: MarkerProgram
 	iconStorage: IconStorage
 
-	defaultIconIndex = 0
-
-	markerIndexes: Array<number> = []
-	markerLatLngs: Array<number> = []
+	activeMarkers: Set<Marker> = new Set()
 
 	hasUpdatedMarkers = false
 
@@ -53,13 +53,9 @@ class MarkerLayer extends MapLayer {
 	onClick() {}
 
 	onHover(x: number, y: number) {
-		let m = this.findClosestMarker(x, y)
-		// Check if pointer is actually over icon
-		if (m) {
-			let markerX = this.markerLatLngs[m]
-			let markerY = this.markerLatLngs[m+1]
-
-			let markerCanvasPos = this.glmap.map2canvas(markerX, markerY)
+		let marker = this.findClosestMarker(x, y)
+		if (marker) {
+			let markerCanvasPos = this.glmap.map2canvas(marker.x, marker.y)
 			let pointerCanvasPos = this.glmap.map2canvas(x, y)
 
 			// TODO: Give choice for hit test: circle, bounding box, alpha != 0 etc. (For now just matching circle)
@@ -79,34 +75,25 @@ class MarkerLayer extends MapLayer {
 
 	createIcon(image: CanvasImageSource, width: number, height: number, anchorX: number, anchorY: number) {
 		let iconIndex = this.iconStorage.createIcon(image, width, height, anchorX, anchorY)
-		return iconIndex	// Todo: Wrap this with class which has wrapper functions to get/set values
+		return new Icon(this.iconStorage, iconIndex)	// Todo: Wrap this with class which has wrapper functions to get/set values
 	}
 
-	addMarker(lat: number, lng: number, iconIndex: number) {
+	addMarker(marker: Marker) {
 		this.hasUpdatedMarkers = true
-
-		if (typeof iconIndex != "number")
-			iconIndex = this.defaultIconIndex
-
-		this.markerIndexes.push(iconIndex)
-		this.markerLatLngs.push(lat, lng)
-		// Todo: Same as with Icon, use wrapper class for ref when removing is required
+		this.activeMarkers.add(marker)
 	}
 
 	findClosestMarker(hitX: number, hitY: number) {
-		let closestIndex = null
+		let closestMarker = null
 		let closestDistance = Infinity
-		for (let i = 0; i < this.markerLatLngs.length; i += 2) {
-			let x = this.markerLatLngs[i]
-			let y = this.markerLatLngs[i+1]
-			let distance = Math.pow(hitX - x, 2) + Math.pow(hitY - y, 2)	// Omit sqrt until final result, doesnt change order
+		for (let marker of this.activeMarkers) {
+			let distance = Math.pow(hitX - marker.x, 2) + Math.pow(hitY - marker.y, 2)	// Omit sqrt until final result, doesnt change order
 			if (distance < closestDistance) {
 				closestDistance = distance
-				closestIndex = i
+				closestMarker = marker
 			}
 		}
-		//console.log(closestIndex / 2, this.markerLatLngs[closestIndex], this.markerLatLngs[closestIndex + 1])
-		return closestIndex
+		return closestMarker
 	}
 
 	render(time: number) {
@@ -117,10 +104,18 @@ class MarkerLayer extends MapLayer {
 		if (this.hasUpdatedMarkers) {
 			this.hasUpdatedMarkers = false
 
-			mp.setMarkerIcons(this.markerIndexes)
-			mp.setMarkerCoordinates(this.markerLatLngs)
+			let markerIcons = []
+			let markerLatLngs = []
+
+			for (let marker of this.activeMarkers) {
+				markerIcons.push(marker.icon.slot)
+				markerLatLngs.push(marker.x, marker.y)
+			}
+
+			mp.setMarkerIcons(markerIcons)
+			mp.setMarkerCoordinates(markerLatLngs)
 			
-			let iconData = this.iconStorage.constructBufferDataForIcons(this.markerIndexes)
+			let iconData = this.iconStorage.constructBufferDataForIcons(markerIcons)
 			mp.setMarkerSizes(iconData.dimensions)
 			mp.setMarkerAnchors(iconData.anchors)
 		}

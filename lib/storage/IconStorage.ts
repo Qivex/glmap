@@ -17,20 +17,28 @@ class IconStorage extends TextureStorage {
 		this.offscreenContext = ctx
 	}
 
-	createIcon(image: CanvasImageSource, displayWidth: number, displayHeight: number, anchorX: number, anchorY: number): number {
-		// Store metadata
-		this.iconDimensions.push(displayWidth, displayHeight)
-		this.iconAnchors.push(anchorX, anchorY)
-
+	getImagePixels(image: CanvasImageSource) {
 		// Rescale image before storing
 		let ctx = this.offscreenContext
 		let w = this.maxWidth,
 			h = this.maxHeight
 		ctx.clearRect(0, 0, w, h)
 		ctx.drawImage(image, 0, 0, w, h)
-		let pixelData = ctx.getImageData(0, 0, w, h)
+		return ctx.getImageData(0, 0, w, h)
+	}
 
+	createIcon(image: CanvasImageSource, displayWidth: number, displayHeight: number, anchorX: number, anchorY: number): number {
+		// Store metadata
+		this.iconDimensions.push(displayWidth, displayHeight)
+		this.iconAnchors.push(anchorX, anchorY)
+
+		let pixelData = this.getImagePixels(image)
 		return this.addTexture(pixelData)
+	}
+
+	updateIconImage(slot: number, image: CanvasImageSource) {
+		let pixelData = this.getImagePixels(image)
+		this.updateTexture(slot, pixelData)
 	}
 
 	getTexture(): WebGLTexture {

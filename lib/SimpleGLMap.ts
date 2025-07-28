@@ -83,8 +83,6 @@ class SimpleGLMap extends GLMap {
 				ml.addMarker(marker)
 			}
 		}
-
-		this.iconRef = icons
 	}
 
 	testPopup() {
@@ -113,18 +111,6 @@ class SimpleGLMap extends GLMap {
 
 	testPinch() {
 		this.addUserInteraction(new PinchInteraction())
-	}
-
-	render(time: number) {
-		//this.setZoom(1.5 * Math.sin(time / 1000) + 5.5)
-		// TODO These updates are only shown if hasUpdatedMarkers is forced to true -> Improve mess with constructBufferDataForIcons (eg. )
-		if (this.iconRef && this.iconRef.length === 6) {
-			this.iconRef[1].setAnchor(0, 16 * (1 + Math.sin(time/1000)))
-			this.iconRef[3].setAnchor(16 * (1 + Math.sin(time/1000)), 0)
-			this.iconRef[2].setAnchor(0, 16 * (1 + Math.cos(time/1000)))
-			this.iconRef[4].setAnchor(16 * (1 + Math.cos(time/1000)), 0)
-		}
-		super.render(time)
 	}
 }
 

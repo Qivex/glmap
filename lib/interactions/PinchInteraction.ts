@@ -1,7 +1,5 @@
 import { PointerInteraction } from "./PointerInteraction"
 
-import type { GLMap } from "../GLMap"
-
 class PinchInteraction extends PointerInteraction {
 	pinnedPos: {x: number, y: number}
 	startZoom: number

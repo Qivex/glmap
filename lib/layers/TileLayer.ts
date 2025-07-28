@@ -184,8 +184,6 @@ class TileLayer extends MapLayer {
 			// TODO: Order by importance (lowest zoom, center of view etc.)
 			missingTiles.reverse()
 
-			// TODO: Filter tiles outside of valid range
-
 			// Fetch tiles
 			for (let tile of missingTiles) {
 				this.tileSource.fetchTile(tile.x, tile.y, tile.z)

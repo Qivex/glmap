@@ -33,6 +33,7 @@ class MarkerLayer extends MapLayer {
 		// Create texture storage for icons
 		this.iconStorage = new IconStorage(context, maxIconCount, maxIconWidth, maxIconHeight)
 		mp.setMarkerTexture(this.iconStorage.getTextureBinding())	// Should never change
+		mp.setIconDataTexture(this.iconStorage.getDataTextureBinding())
 	}
 
 	onPan(x: number, y: number) {
@@ -75,7 +76,7 @@ class MarkerLayer extends MapLayer {
 
 	createIcon(image: CanvasImageSource, width: number, height: number, anchorX: number, anchorY: number) {
 		let iconIndex = this.iconStorage.createIcon(image, width, height, anchorX, anchorY)
-		return new Icon(this.iconStorage, iconIndex)	// Todo: Wrap this with class which has wrapper functions to get/set values
+		return new Icon(this.iconStorage, iconIndex)
 	}
 
 	addMarker(marker: Marker) {
@@ -114,10 +115,6 @@ class MarkerLayer extends MapLayer {
 
 			mp.setMarkerIcons(markerIcons)
 			mp.setMarkerCoordinates(markerLatLngs)
-			
-			let iconData = this.iconStorage.constructBufferDataForIcons(markerIcons)
-			mp.setMarkerSizes(iconData.dimensions)
-			mp.setMarkerAnchors(iconData.anchors)
 		}
 		
 		mp.draw()

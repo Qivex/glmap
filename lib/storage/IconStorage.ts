@@ -1,9 +1,9 @@
 import { TextureStorage } from "./TextureStorage"
+import { DataTexture } from "../DataTexture"
 
 class IconStorage extends TextureStorage {
-	// Store icon data
-	iconDimensions: Array<number> = []
-	iconAnchors: Array<number> = []
+	// Stores iconSize & iconAnchor
+	iconDataTexture: DataTexture
 
 	// Used to rescale images to fixed icon size before adding to texture
 	offscreenContext: OffscreenCanvasRenderingContext2D
@@ -15,6 +15,9 @@ class IconStorage extends TextureStorage {
 		if (ctx === null)
 			throw new Error("OffscreenCanvas creation failed")
 		this.offscreenContext = ctx
+
+		// Used as lookup of variable length (vertex attribute would be very redundant, uniforms have fixed length)
+		this.iconDataTexture = new DataTexture(context, 4, maxIconCount)
 	}
 
 	getImagePixels(image: CanvasImageSource) {
@@ -28,30 +31,31 @@ class IconStorage extends TextureStorage {
 	}
 
 	createIcon(image: CanvasImageSource, displayWidth: number, displayHeight: number, anchorX: number, anchorY: number): number {
-		// Store metadata
-		this.iconDimensions.push(displayWidth, displayHeight)
-		this.iconAnchors.push(anchorX, anchorY)
-
+		// Store texture
 		let pixelData = this.getImagePixels(image)
-		return this.addTexture(pixelData)
+		let iconIndex = this.addTexture(pixelData)
+
+		// Store additional data
+		this.iconDataTexture.setData(iconIndex, [displayWidth, displayHeight, anchorX, anchorY])
+
+		return iconIndex
 	}
 
-	updateIconImage(slot: number, image: CanvasImageSource) {
+	setIconImage(slot: number, image: CanvasImageSource) {
 		let pixelData = this.getImagePixels(image)
 		this.updateTexture(slot, pixelData)
 	}
 
-	getTexture(): WebGLTexture {
-		return this.texture
+	setIconSize(slot: number, width: number, height: number) {
+		this.iconDataTexture.setData(slot, [width, height])
 	}
 
-	constructBufferDataForIcons(iconIndexes: Array<number>): {dimensions: Array<number>, anchors: Array<number>} {
-		let d = this.iconDimensions
-		let a = this.iconAnchors
-		return {
-			dimensions: iconIndexes.flatMap(i => [d[2*i], d[2*i + 1]]),
-			anchors:    iconIndexes.flatMap(i => [a[2*i], a[2*i + 1]])
-		}
+	setIconAnchor(slot: number, x: number, y: number) {
+		this.iconDataTexture.setData(slot, [x, y], 2)
+	}
+
+	getDataTextureBinding(): WebGLTexture {
+		return this.iconDataTexture.getTextureBinding()
 	}
 }
 

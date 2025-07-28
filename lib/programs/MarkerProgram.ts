@@ -10,20 +10,17 @@ class MarkerProgram extends ShaderProgram {
 
 	vertexPosAttributeLocation: number
 	markerPosAttributeLocation: number
-	iconSizeAttributeLocation: number
-	iconAnchorAttributeLocation: number
 	iconIndexAttributeLocation: number
 
 	attributeArray: WebGLVertexArrayObject | null
 
 	vertexBuffer: WebGLBuffer | null
 	markerBuffer: WebGLBuffer | null
-	sizeBuffer: WebGLBuffer | null
-	anchorBuffer: WebGLBuffer | null
 	indexBuffer: WebGLBuffer | null
 
 	markerCount = 0
-	texture: WebGLTexture
+	dataTexture: WebGLTexture
+	iconTexture: WebGLTexture
 
 	constructor(context: WebGL2RenderingContext) {
 		super(context)
@@ -35,6 +32,11 @@ class MarkerProgram extends ShaderProgram {
 		this.centerUniformLocation     = gl.getUniformLocation(this.program, "center")
 		this.zoomUniformLocation       = gl.getUniformLocation(this.program, "zoom")
 
+		// Set texture units
+		this.activate()
+		gl.uniform1i(gl.getUniformLocation(this.program, "iconData"), 0)
+		gl.uniform1i(gl.getUniformLocation(this.program, "icons"   ), 1)
+
 		// Store attributes
 		this.attributeArray = gl.createVertexArray()
 		gl.bindVertexArray(this.attributeArray)
@@ -42,13 +44,9 @@ class MarkerProgram extends ShaderProgram {
 		// Cache attribute locations & activate them
 		this.vertexPosAttributeLocation  = gl.getAttribLocation(this.program, "vertexPos")
 		this.markerPosAttributeLocation  = gl.getAttribLocation(this.program, "markerPos")
-		this.iconSizeAttributeLocation   = gl.getAttribLocation(this.program, "iconSize")
-		this.iconAnchorAttributeLocation = gl.getAttribLocation(this.program, "iconAnchor")
 		this.iconIndexAttributeLocation  = gl.getAttribLocation(this.program, "iconIndex")
 		gl.enableVertexAttribArray(this.vertexPosAttributeLocation)
 		gl.enableVertexAttribArray(this.markerPosAttributeLocation)
-		gl.enableVertexAttribArray(this.iconSizeAttributeLocation)
-		gl.enableVertexAttribArray(this.iconAnchorAttributeLocation)
 		gl.enableVertexAttribArray(this.iconIndexAttributeLocation)
 
 		// Setup buffers to fill attributes
@@ -62,16 +60,6 @@ class MarkerProgram extends ShaderProgram {
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.markerBuffer)
 		gl.vertexAttribPointer(this.markerPosAttributeLocation, 2, gl.FLOAT, false, 0, 0)
 		gl.vertexAttribDivisor(this.markerPosAttributeLocation, 1)
-
-		this.sizeBuffer = gl.createBuffer()
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.sizeBuffer)
-		gl.vertexAttribPointer(this.iconSizeAttributeLocation, 2, gl.FLOAT, false, 0, 0)
-		gl.vertexAttribDivisor(this.iconSizeAttributeLocation, 1)
-
-		this.anchorBuffer = gl.createBuffer()
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.anchorBuffer)
-		gl.vertexAttribPointer(this.iconAnchorAttributeLocation, 2, gl.FLOAT, false, 0, 0)
-		gl.vertexAttribDivisor(this.iconAnchorAttributeLocation, 1)
 
 		this.indexBuffer = gl.createBuffer()
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.indexBuffer)
@@ -100,33 +88,28 @@ class MarkerProgram extends ShaderProgram {
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(coords), gl.STATIC_DRAW)
 	}
 
-	setMarkerSizes(sizes: Array<number>) {
-		let gl = this.context
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.sizeBuffer)
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(sizes), gl.STATIC_DRAW)
-	}
-
-	setMarkerAnchors(anchors: Array<number>) {
-		let gl = this.context
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.anchorBuffer)
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(anchors), gl.STATIC_DRAW)
-	}
-
 	setMarkerIcons(indexes: Array<number>) {
 		let gl = this.context
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.indexBuffer)
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(indexes), gl.STATIC_DRAW)
 	}
+	
 
-	// Store texture
+	// Store textures
+	setIconDataTexture(texture: WebGLTexture) {
+		this.dataTexture = texture
+	}
+
 	setMarkerTexture(texture: WebGLTexture) {
-		this.texture = texture
+		this.iconTexture = texture
 	}	
 
 	draw() {
 		let gl = this.context
 		gl.activeTexture(gl.TEXTURE0)
-		gl.bindTexture(gl.TEXTURE_2D_ARRAY, this.texture)
+		gl.bindTexture(gl.TEXTURE_2D, this.dataTexture)
+		gl.activeTexture(gl.TEXTURE1)
+		gl.bindTexture(gl.TEXTURE_2D_ARRAY, this.iconTexture)
 		gl.bindVertexArray(this.attributeArray)
 		gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, this.markerCount)
 	}

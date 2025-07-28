@@ -12,31 +12,15 @@ class Icon {
 	}
 
 	setImage(image: CanvasImageSource) {
-		this.iconStorage.updateIconImage(this.slot, image)
-	}
-
-	getSize() {
-		return {
-			width:  this.iconStorage.iconDimensions[2 * this.slot],
-			height: this.iconStorage.iconDimensions[2 * this.slot + 1]
-		}
+		this.iconStorage.setIconImage(this.slot, image)
 	}
 
 	setSize(width: number, height: number) {
-		this.iconStorage.iconDimensions[2 * this.slot]     = width
-		this.iconStorage.iconDimensions[2 * this.slot + 1] = height
-	}
-
-	getAnchor() {
-		return {
-			width:  this.iconStorage.iconAnchors[2 * this.slot],
-			height: this.iconStorage.iconAnchors[2 * this.slot + 1]
-		}
+		this.iconStorage.setIconSize(this.slot, width, height)
 	}
 
 	setAnchor(x: number, y: number) {
-		this.iconStorage.iconAnchors[2 * this.slot]     = x
-		this.iconStorage.iconAnchors[2 * this.slot + 1] = y
+		this.iconStorage.setIconAnchor(this.slot, x, y)
 	}
 }
 

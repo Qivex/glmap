@@ -39,6 +39,18 @@ class GLMap extends CanvasContext {
 		this.interactions.push(interaction)
 	}
 
+	onClick(x: number, y: number) {
+		for (let layer of this.layers) {
+			layer.onClick(x, y)
+		}
+	}
+
+	onHover(x: number, y: number) {
+		for (let layer of this.layers) {
+			layer.onHover(x, y)
+		}
+	}
+
 	setCenter(x: number, y: number) {
 		this.centerX = x
 		this.centerY = y

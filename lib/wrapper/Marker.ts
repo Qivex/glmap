@@ -24,6 +24,10 @@ class Marker {
 			this.markerLayer = null
 		}
 	}
+
+	onClick() {
+		console.log(this)
+	}
 }
 
 export { Marker }

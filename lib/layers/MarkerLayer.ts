@@ -51,26 +51,21 @@ class MarkerLayer extends MapLayer {
 		this.markerProgram.setResolution(w, h)
 	}
 
-	onClick() {}
+	onClick(x: number, y: number) {
+		let marker = this.findMarkerAt(x, y)
+		if (marker) {
+			marker.onClick()
+		}
+	}
 
 	onHover(x: number, y: number) {
-		let marker = this.findClosestMarker(x, y)
+		let canvasStyle = this.glmap.getCanvasElement().style
+
+		let marker = this.findMarkerAt(x, y)
 		if (marker) {
-			let markerCanvasPos = this.glmap.map2canvas(marker.x, marker.y)
-			let pointerCanvasPos = this.glmap.map2canvas(x, y)
-
-			// TODO: Give choice for hit test: circle, bounding box, alpha != 0 etc. (For now just matching circle)
-			let distancePixels = Math.sqrt(
-				Math.pow(markerCanvasPos.x - pointerCanvasPos.x, 2) +
-				Math.pow(markerCanvasPos.y - pointerCanvasPos.y, 2)
-			)
-
-			let canvasElement = this.glmap.getCanvasElement()
-			if (distancePixels < 16) {
-				canvasElement.style.cursor = "pointer"
-			} else if (canvasElement.style.cursor === "pointer") {
-				canvasElement.style.removeProperty("cursor")
-			}
+			canvasStyle.cursor = "pointer"
+		} else if (canvasStyle.cursor === "pointer") {
+			canvasStyle.removeProperty("cursor")
 		}
 	}
 
@@ -84,17 +79,36 @@ class MarkerLayer extends MapLayer {
 		this.activeMarkers.add(marker)
 	}
 
-	findClosestMarker(hitX: number, hitY: number) {
+	findClosestMarker(x: number, y: number) {
 		let closestMarker = null
 		let closestDistance = Infinity
 		for (let marker of this.activeMarkers) {
-			let distance = Math.pow(hitX - marker.x, 2) + Math.pow(hitY - marker.y, 2)	// Omit sqrt until final result, doesnt change order
+			let distance = Math.pow(x - marker.x, 2) + Math.pow(y - marker.y, 2)	// Omit sqrt until final result, doesnt change order
 			if (distance < closestDistance) {
 				closestDistance = distance
 				closestMarker = marker
 			}
 		}
 		return closestMarker
+	}
+
+	findMarkerAt(x: number, y: number) {
+		let marker = this.findClosestMarker(x, y)
+		if (marker) {
+			// Hit test - For now just matching circle
+			// TODO: Give choice: circle, bounding box, alpha != 0 etc.
+			let markerCanvasPos = this.glmap.map2canvas(marker.x, marker.y)
+			let pointerCanvasPos = this.glmap.map2canvas(x, y)
+
+			let distancePixels = Math.sqrt(
+				Math.pow(markerCanvasPos.x - pointerCanvasPos.x, 2) +
+				Math.pow(markerCanvasPos.y - pointerCanvasPos.y, 2)
+			)
+
+			if (distancePixels < 16)
+				return marker
+		}
+		return null
 	}
 
 	render(time: number) {

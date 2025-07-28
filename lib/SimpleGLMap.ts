@@ -7,10 +7,10 @@ import { PopupLayer } from "./layers/PopupLayer"
 import { Popup } from "./Popup"
 import { Marker } from "./wrapper/Marker"
 
-import { PanInteraction } from "./interactions/PanInteraction"
 import { ZoomInteraction } from "./interactions/ZoomInteraction"
 import { HoverInteraction } from "./interactions/HoverInteraction"
 import { PinchInteraction } from "./interactions/PinchInteraction"
+import { ClickInteraction } from "./interactions/ClickInteraction"
 
 class SimpleGLMap extends GLMap {
 	tileLayer: TileLayer
@@ -97,10 +97,6 @@ class SimpleGLMap extends GLMap {
 		this.popupLayer.addPopup(testPopup)
 	}
 
-	testPanning() {
-		this.addUserInteraction(new PanInteraction())
-	}
-
 	testZooming() {
 		this.addUserInteraction(new ZoomInteraction())
 	}
@@ -111,6 +107,10 @@ class SimpleGLMap extends GLMap {
 
 	testPinch() {
 		this.addUserInteraction(new PinchInteraction())
+	}
+
+	testClick() {
+		this.addUserInteraction(new ClickInteraction())
 	}
 }
 

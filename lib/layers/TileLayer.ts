@@ -1,6 +1,6 @@
 import { MapLayer } from "./MapLayer.ts"
 
-import { TileProgram } from "../programs/SimpleTileProgram.ts"
+import { TileProgram } from "../programs/TileProgram.ts"
 import { TileSource } from "../TileSource.ts"
 import { TileStorage } from "../storage/TileStorage.ts"
 

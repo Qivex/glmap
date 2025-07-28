@@ -23,6 +23,12 @@ function compareTileBounds(t1: TileBoundsType, t2: TileBoundsType) {
 			t1.maxZoom === t2.maxZoom)
 }
 
+function compareTilePositions(t1: TilePositionType, t2: TilePositionType) {
+	return (t1.x === t2.x &&
+			t1.y === t2.y &&
+			t1.z === t2.z)
+}
+
 
 class TileLayer extends MapLayer {
 	tileWidth = 256
@@ -220,7 +226,9 @@ class TileLayer extends MapLayer {
 					this.hasUpdatedTiles = false	// Only set when queue is empty
 					break
 				}
-				this.tileStorage.createTile(queueItem.image, queueItem.tile)
+				// Skip if no longer required (= when requiredTiles changed before download finished)
+				if (this.requiredTiles.some(tile => compareTilePositions(queueItem.tile, tile)))
+					this.tileStorage.createTile(queueItem.image, queueItem.tile)
 			}
 
 			let {slices, positions} = this.tileStorage.constructBufferDataForTiles()

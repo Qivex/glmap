@@ -35,12 +35,17 @@ class PinchInteraction extends PointerInteraction {
 	}
 
 	onPointerAmountChange(newAmount: number): void {
+		let classList = this.glmap.getCanvasElement().classList
 		if (newAmount > 0) {
 			// Store new position to remain pinned at new pointer average
 			const pointerAverage = this.getPointerAverage()
 			this.pinnedPos = this.glmap.canvas2map(pointerAverage.x, pointerAverage.y)
 			this.startZoom = this.glmap.getZoom()
 			this.startDist = this.getTotalPointerDistanceFrom(pointerAverage.x, pointerAverage.y)
+			// Change cursor
+			classList.add("glmap-drag")
+		} else {
+			classList.remove("glmap-drag")
 		}
 	}
 

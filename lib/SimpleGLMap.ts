@@ -12,6 +12,8 @@ import { HoverInteraction } from "./interactions/HoverInteraction"
 import { PinchInteraction } from "./interactions/PinchInteraction"
 import { ClickInteraction } from "./interactions/ClickInteraction"
 
+import style from "./style/glmap.css?raw"
+
 class SimpleGLMap extends GLMap {
 	tileLayer: TileLayer
 	markerLayer: MarkerLayer
@@ -21,6 +23,12 @@ class SimpleGLMap extends GLMap {
 	constructor(canvasElement: HTMLCanvasElement) {
 		super(canvasElement)
 		// TEMP: Extracted into test*() functions to enable/disable easily in demo.js
+
+		// Add style (while not modifying header)
+		let sheet = new CSSStyleSheet()
+		document.adoptedStyleSheets.push(sheet)
+		sheet.replace(style)
+		canvasElement.classList.add("glmap")
 
 		this.setCenter(64, 128)
 		this.setZoom(6)

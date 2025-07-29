@@ -59,13 +59,13 @@ class MarkerLayer extends MapLayer {
 	}
 
 	onHover(x: number, y: number) {
-		let canvasStyle = this.glmap.getCanvasElement().style
+		let canvasClasses = this.glmap.getCanvasElement().classList
 
 		let marker = this.findMarkerAt(x, y)
 		if (marker) {
-			canvasStyle.cursor = "pointer"
-		} else if (canvasStyle.cursor === "pointer") {
-			canvasStyle.removeProperty("cursor")
+			canvasClasses.add("glmap-marker-hover")
+		} else {
+			canvasClasses.remove("glmap-marker-hover")
 		}
 	}
 

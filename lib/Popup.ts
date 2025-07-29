@@ -25,11 +25,11 @@ class Popup {
 	}
 
 	show() {
-		this.element.style.removeProperty("display")
+		this.element.classList.remove("glmap-popup-hidden")
 	}
 
 	hide() {
-		this.element.style.display = "none"
+		this.element.classList.add("glmap-popup-hidden")
 	}
 }
 

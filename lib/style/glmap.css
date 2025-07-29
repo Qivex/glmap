@@ -1,0 +1,18 @@
+/* Don't change cursor on mobile because it causes blue flicker */
+@media (pointer: fine) {
+	.glmap {
+		cursor: grab;
+	}
+
+	.glmap.glmap-drag {
+		cursor: grabbing;
+	}
+
+	.glmap.glmap-marker-hover {
+		cursor: pointer;
+	}
+}
+
+.glmap-popup-hidden {
+	display: none;
+}

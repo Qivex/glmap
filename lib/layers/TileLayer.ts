@@ -160,10 +160,6 @@ class TileLayer extends MapLayer {
 				}
 			}
 
-			// 1x1 tile covers entire canvas
-			if (maxX <= minX && maxY <= minY)
-				break
-
 			// Decrease grid scale
 			minX = Math.floor(minX / 2)
 			maxX = Math.floor(maxX / 2)

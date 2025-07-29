@@ -93,8 +93,20 @@ class SimpleGLMap extends GLMap {
 		this.addMapLayer(this.popupLayer)
 
 		let testPopup = new Popup(document.getElementById("popup"), 50, 25)
-		testPopup.showAt(64, 128)
-		this.popupLayer.addPopup(testPopup)
+
+		for (let marker of this.markerLayer.activeMarkers) {
+			marker.onClick = () => {
+				this.popupLayer.removePopup(testPopup)
+				testPopup.element.childNodes[1].textContent = `${marker.x},${marker.y}`
+				testPopup.setLocation(marker.x, marker.y)
+				this.popupLayer.addPopup(testPopup)
+			}
+		}
+
+		let fixedPopup = new Popup(document.getElementById("fixed-popup"), 50, 25)
+		fixedPopup.setLocation(64, 128)
+		this.popupLayer.addPopup(fixedPopup)
+
 	}
 
 	testZooming() {

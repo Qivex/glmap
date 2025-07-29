@@ -3,8 +3,8 @@ import { MapLayer } from "./MapLayer"
 import type { MapLayerConfig } from "../types/types"
 import type { Popup } from "../Popup"
 
-class PopupLayer extends MapLayer {
-	openPopups: Array<Popup> = []
+class PopupLayer extends MapLayer { 
+	openPopups: Map<HTMLElement, Popup> = new Map()
 	popupResizeObserver: ResizeObserver
 
 	constructor(config: MapLayerConfig) {
@@ -13,7 +13,7 @@ class PopupLayer extends MapLayer {
 		// Clip resizing popups correctly
 		this.popupResizeObserver = new ResizeObserver((elems) => {
 			for (let el of elems) {
-				let popup = this.openPopups.find(p => p.element === el.target)
+				let popup = this.openPopups.get(el.target as HTMLElement)
 				if (popup) {
 					const {width, height} = el.contentRect
 					popup.width = width
@@ -25,22 +25,30 @@ class PopupLayer extends MapLayer {
 	}
 
 	addPopup(popup: Popup) {
-		this.openPopups.push(popup)
+		popup.show()
+		this.openPopups.set(popup.element, popup)
 		this.popupResizeObserver.observe(popup.element)
 		this.updatePopupPositions()	// Force update to display immediately
 	}
 
+	removePopup(popup: Popup) {
+		popup.hide()
+		this.openPopups.delete(popup.element)
+		this.popupResizeObserver.unobserve(popup.element)
+	}
+
 	clearPopups() {
-		for (let popup of this.openPopups) {
-			popup.close()
+		for (let popup of this.openPopups.values()) {
+			popup.hide()
 		}
-		this.openPopups = []
+		this.openPopups.clear()
+		this.popupResizeObserver.disconnect()
 	}
 
 	updatePopupPositions() {
 		let canvasBox = this.glmap.getCanvasElement().getBoundingClientRect()
 
-		for (let popup of this.openPopups) {
+		for (let popup of this.openPopups.values()) {
 			// Calculate client position
 			let canvasPos = this.glmap.map2canvas(popup.mapX, popup.mapY)
 

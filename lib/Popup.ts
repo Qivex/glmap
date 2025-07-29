@@ -19,13 +19,17 @@ class Popup {
 		element.style.position = "fixed"
 	}
 
-	showAt(x: number, y: number) {
+	setLocation(x: number, y: number) {
 		this.mapX = x
 		this.mapY = y
 	}
 
-	close() {
+	show() {
+		this.element.style.removeProperty("display")
+	}
 
+	hide() {
+		this.element.style.display = "none"
 	}
 }
 

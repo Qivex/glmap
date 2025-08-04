@@ -7,7 +7,7 @@ import type { MarkerLayerConfig } from "../types/types.ts"
 import { Icon } from "../wrapper/Icon"
 import type { Marker } from "../wrapper/Marker"
 
-import type { CoordEvent } from "../events/CoordEvent.ts"
+import { CoordEvent } from "../events/CoordEvent.ts"
 import type { ZoomEvent } from "../events/ZoomEvent.ts"
 import type { ResizeEvent } from "../events/ResizeEvent.ts"
 
@@ -68,20 +68,23 @@ class MarkerLayer extends MapLayer {
 	}
 
 	onClick(clickEvent: CoordEvent) {
-		let marker = this.findMarkerAt(clickEvent.x, clickEvent.y)
+		const {x, y} = clickEvent
+		let marker = this.findMarkerAt(x, y)
 		if (marker) {
 			clickEvent.preventDefault()
-			marker.onClick()
+			marker.dispatchEvent(new CoordEvent("click", {x, y}))
 		}
 	}
 
 	onHover(hoverEvent: CoordEvent) {
 		let canvasClasses = this.glmap.getCanvasElement().classList
 
-		let marker = this.findMarkerAt(hoverEvent.x, hoverEvent.y)
+		let {x, y} = hoverEvent
+		let marker = this.findMarkerAt(x, y)
 		if (marker) {
 			hoverEvent.preventDefault()
 			canvasClasses.add("glmap-marker-hover")
+			marker.dispatchEvent(new CoordEvent("hover", {x, y}))
 		} else {
 			canvasClasses.remove("glmap-marker-hover")
 		}

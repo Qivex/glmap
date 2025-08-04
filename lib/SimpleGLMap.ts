@@ -103,12 +103,12 @@ class SimpleGLMap extends GLMap {
 		let testPopup = new Popup(document.getElementById("popup"), 50, 25)
 
 		for (let marker of this.markerLayer.activeMarkers) {
-			marker.onClick = () => {
+			marker.addEventListener("click", () => {
 				this.popupLayer.removePopup(testPopup)
 				testPopup.element.childNodes[1].textContent = `${marker.x},${marker.y}`
 				testPopup.setLocation(marker.x, marker.y)
 				this.popupLayer.addPopup(testPopup)
-			}
+			})
 		}
 		this.tileLayer.addEventListener("click", () => this.popupLayer.removePopup(testPopup))
 	}

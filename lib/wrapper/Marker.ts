@@ -1,7 +1,7 @@
 import type { MarkerLayer } from "../layers/MarkerLayer"
 import type { Icon } from "./Icon"
 
-class Marker {
+class Marker extends EventTarget {
 	x: number
 	y: number
 	icon: Icon
@@ -10,6 +10,7 @@ class Marker {
 	index: number | null = null
 
 	constructor(x: number, y: number, icon: Icon) {
+		super()
 		this.x = x
 		this.y = y
 		this.icon = icon
@@ -23,10 +24,6 @@ class Marker {
 		if (this.markerLayer) {
 			this.markerLayer = null
 		}
-	}
-
-	onClick() {
-		console.log(this)
 	}
 }
 

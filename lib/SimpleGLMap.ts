@@ -14,10 +14,14 @@ import { ClickInteraction } from "./interactions/ClickInteraction"
 
 import style from "./style/glmap.css?raw"
 
+import { CircleLayer } from "../examples/circle-layer/CircleLayer"
+import { Circle } from "../examples/circle-layer/Circle"
+
 class SimpleGLMap extends GLMap {
 	tileLayer: TileLayer
 	markerLayer: MarkerLayer
 	popupLayer: PopupLayer
+	circleLayer: CircleLayer
 
 
 	constructor(canvasElement: HTMLCanvasElement) {
@@ -111,6 +115,16 @@ class SimpleGLMap extends GLMap {
 			})
 		}
 		this.tileLayer.addEventListener("click", () => this.popupLayer.removePopup(testPopup))
+	}
+
+	testCircle() {
+		this.circleLayer = new CircleLayer({
+			glmap: this,
+			context: this.context
+		})
+		this.addMapLayer(this.circleLayer)
+
+		this.circleLayer.addCircle(new Circle({center: [64,128], radius: 5, color: [1,1,0,0.2]}))
 	}
 
 	testZooming() {

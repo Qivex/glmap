@@ -23,5 +23,5 @@
 
 		"typeRoots": ["./lib/types/declarations.d.ts"]
 	},
-	"include": ["lib"]
+	"include": ["./"]
 }

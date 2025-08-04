@@ -37,8 +37,14 @@ class MarkerLayer extends MapLayer {
 		this.addEventListener("hover", this.onHover as EventListener)
 
 		// Setup shader program
-		let mp = new MarkerProgram(context)
-		this.markerProgram = mp
+		this.markerProgram = new MarkerProgram(context)
+		let mp = this.markerProgram
+		mp.activate()
+
+		// Set initial values before first render
+		mp.setCenter(this.centerX, this.centerY)
+		mp.setZoom(this.zoom)
+		mp.setResolution(this.width, this.height)
 		
 		// Create texture storage for icons
 		this.iconStorage = new IconStorage(context, maxIconCount, maxIconWidth, maxIconHeight)

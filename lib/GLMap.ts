@@ -33,11 +33,6 @@ class GLMap extends CanvasContext {
 
 	addMapLayer(layer: MapLayer) {
 		this.layers.push(layer)
-		// Send initial state (processed before first render)
-		// TODO: Just use new getters in MapLayer-children constructors
-		layer.dispatchEvent(new CoordEvent("pan", {x: this.centerX, y: this.centerY}))
-		layer.dispatchEvent(new ZoomEvent("zoom", {zoom: this.zoom}))
-		layer.dispatchEvent(new ResizeEvent("resize", {width: this.resolutionWidth, height: this.resolutionHeight}))
 	}
 
 	addUserInteraction(interaction: UserInteraction) {

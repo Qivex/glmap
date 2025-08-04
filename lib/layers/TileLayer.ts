@@ -65,14 +65,25 @@ class TileLayer extends MapLayer {
 			tileLimits
 		} = config
 		Object.assign(this, {tileWidth, tileHeight, tileLimits})
-			
-		this.tileProgram = new TileProgram(context)
+		
+		// Create tile source & force initial calculation + fetch
 		this.tileSource = new TileSource(tileURL)
-		this.tileStorage = new TileStorage(context, tileWidth, tileHeight)
+		this.hasUpdatedArea = true
 
-		this.tileProgram.activate()
-		this.tileProgram.setTileSize(this.tileWidth, this.tileHeight)
-		this.tileProgram.setTileTexture(this.tileStorage.getTextureBinding())
+		// Setup shader program
+		this.tileProgram = new TileProgram(context)
+		let tp = this.tileProgram
+		tp.activate()
+		
+		// Set initial values before first render
+		tp.setCenter(this.centerX, this.centerY)
+		tp.setZoom(this.zoom)
+		tp.setResolution(this.width, this.height)
+		tp.setTileSize(this.tileWidth, this.tileHeight)
+
+		// Create texture storage for icons
+		this.tileStorage = new TileStorage(context, tileWidth, tileHeight)
+		tp.setTileTexture(this.tileStorage.getTextureBinding())
 	}
 
 	onPan(panEvent: CoordEvent) {

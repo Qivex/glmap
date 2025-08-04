@@ -100,6 +100,11 @@ class MarkerLayer extends MapLayer {
 		this.activeMarkers.add(marker)
 	}
 
+	removeMarker(marker: Marker) {
+		this.hasUpdatedMarkers = true
+		this.activeMarkers.delete(marker)
+	}
+
 	findClosestMarker(x: number, y: number) {
 		let closestMarker = null
 		let closestDistance = Infinity

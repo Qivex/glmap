@@ -46,6 +46,22 @@ type QueueItemType = {
 }
 
 
+// Events
+interface CoordEventInit extends EventInit {
+	x: number,
+	y: number
+}
+
+interface ResizeEventInit extends EventInit {
+	width: number,
+	height: number
+}
+
+interface ZoomEventInit extends EventInit {
+	zoom: number
+}
+
+
 
 export type {
 	Lookup,
@@ -56,5 +72,9 @@ export type {
 
 	TileBoundsType,
 	TilePositionType,
-	QueueItemType
+	QueueItemType,
+
+	CoordEventInit,
+	ResizeEventInit,
+	ZoomEventInit
 }

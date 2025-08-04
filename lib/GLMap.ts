@@ -1,7 +1,12 @@
 import { CanvasContext } from "./CanvasContext"
 
+import { CoordEvent } from "./events/CoordEvent"
+import { ResizeEvent } from "./events/ResizeEvent"
+import { ZoomEvent } from "./events/ZoomEvent"
+
 import type { UserInteraction } from "./interactions/UserInteraction"
 import type { MapLayer } from "./layers/MapLayer"
+
 
 class GLMap extends CanvasContext {
 	layers: Array<MapLayer> = []
@@ -29,9 +34,10 @@ class GLMap extends CanvasContext {
 	addMapLayer(layer: MapLayer) {
 		this.layers.push(layer)
 		// Send initial state (processed before first render)
-		layer.setCenter(this.centerX, this.centerY)
-		layer.setZoom(this.zoom)
-		layer.setResolution(this.resolutionWidth, this.resolutionHeight)
+		// TODO: Just use new getters in MapLayer-children constructors
+		layer.dispatchEvent(new CoordEvent("pan", {x: this.centerX, y: this.centerY}))
+		layer.dispatchEvent(new ZoomEvent("zoom", {zoom: this.zoom}))
+		layer.dispatchEvent(new ResizeEvent("resize", {width: this.resolutionWidth, height: this.resolutionHeight}))
 	}
 
 	addUserInteraction(interaction: UserInteraction) {
@@ -39,23 +45,29 @@ class GLMap extends CanvasContext {
 		this.interactions.push(interaction)
 	}
 
-	onClick(x: number, y: number) {
-		for (let layer of this.layers) {
-			layer.onClick(x, y)
+	dispatchEventToLayers(event: Event) {
+		// Reverse order because top layer is (rendered) last
+		for (let layer of this.layers.toReversed()) {
+			let shouldPropagate = layer.dispatchEvent(event)
+			// Layers can use event.preventDefault() to block layers below them from receiving the event
+			if (!shouldPropagate)
+				break
 		}
+	}
+
+	onClick(x: number, y: number) {
+		this.dispatchEventToLayers(new CoordEvent("click", {x, y}))
 	}
 
 	onHover(x: number, y: number) {
-		for (let layer of this.layers) {
-			layer.onHover(x, y)
-		}
+		this.dispatchEventToLayers(new CoordEvent("hover", {x, y}))
 	}
 
 	setCenter(x: number, y: number) {
-		this.centerX = x
-		this.centerY = y
-		for (let layer of this.layers) {
-			layer.setCenter(x, y)
+		if (x !== this.centerX || y !== this.centerY) {
+			this.centerX = x
+			this.centerY = y
+			this.dispatchEventToLayers(new CoordEvent("pan", {x, y}))
 		}
 	}
 
@@ -64,9 +76,9 @@ class GLMap extends CanvasContext {
 	}
 
 	setZoom(zoom: number) {
-		this.zoom = zoom
-		for (let layer of this.layers) {
-			layer.setZoom(zoom)
+		if (zoom !== this.zoom) {
+			this.zoom = zoom
+			this.dispatchEventToLayers(new ZoomEvent("zoom", {zoom}))
 		}
 	}
 
@@ -107,9 +119,7 @@ class GLMap extends CanvasContext {
 		if (w !== this.resolutionWidth || h !== this.resolutionHeight) {
 			this.resolutionWidth = w
 			this.resolutionHeight = h
-			for (let layer of this.layers) {
-				layer.setResolution(w, h)
-			}
+			this.dispatchEventToLayers(new ResizeEvent("resize", {width: w, height: h}))
 		}
 
 		gl.viewport(0, 0, w, h)

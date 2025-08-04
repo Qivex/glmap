@@ -110,11 +110,7 @@ class SimpleGLMap extends GLMap {
 				this.popupLayer.addPopup(testPopup)
 			}
 		}
-
-		let fixedPopup = new Popup(document.getElementById("fixed-popup"), 50, 25)
-		fixedPopup.setLocation(64, 128)
-		this.popupLayer.addPopup(fixedPopup)
-
+		this.tileLayer.addEventListener("click", () => this.popupLayer.removePopup(testPopup))
 	}
 
 	testZooming() {

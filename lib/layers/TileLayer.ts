@@ -5,6 +5,9 @@ import { TileSource } from "../TileSource.ts"
 import { TileStorage } from "../storage/TileStorage.ts"
 
 import type { TileLayerConfig, TileBoundsType, TilePositionType, QueueItemType } from "../types/types.ts"
+import type { CoordEvent } from "../events/CoordEvent.ts"
+import type { ZoomEvent } from "../events/ZoomEvent.ts"
+import type { ResizeEvent } from "../events/ResizeEvent.ts"
 
 
 
@@ -49,6 +52,10 @@ class TileLayer extends MapLayer {
 
 	constructor(config: TileLayerConfig) {
 		super(config)
+
+		this.addEventListener("pan", this.onPan as EventListener)
+		this.addEventListener("zoom", this.onZoom as EventListener)
+		this.addEventListener("resize", this.onResize as EventListener)
 		
 		const {
 			context,
@@ -68,30 +75,26 @@ class TileLayer extends MapLayer {
 		this.tileProgram.setTileTexture(this.tileStorage.getTextureBinding())
 	}
 
-	onPan(newCenterX: number, newCenterY: number) {
+	onPan(panEvent: CoordEvent) {
 		this.hasUpdatedArea = true
 
 		this.tileProgram.activate()
-		this.tileProgram.setCenter(newCenterX, newCenterY)
+		this.tileProgram.setCenter(panEvent.x, panEvent.y)
 	}
 
-	onZoom(newZoom: number) {
+	onZoom(zoomEvent: ZoomEvent) {
 		this.hasUpdatedArea = true
 
 		this.tileProgram.activate()
-		this.tileProgram.setZoom(newZoom)
+		this.tileProgram.setZoom(zoomEvent.zoom)
 	}
 
-	onResize(newWidth: number, newHeight: number) {
+	onResize(resizeEvent: ResizeEvent) {
 		this.hasUpdatedArea = true
 
 		this.tileProgram.activate()
-		this.tileProgram.setResolution(newWidth, newHeight)
+		this.tileProgram.setResolution(resizeEvent.width, resizeEvent.height)
 	}
-
-	// Not required
-	onHover() {}
-	onClick() {}
 
 	updateTileBounds(): boolean {
 		let zoomLevel = Math.floor(this.zoom + 0.5)

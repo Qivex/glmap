@@ -1,17 +1,13 @@
 import type { GLMap } from "../GLMap"
 import type { MapLayerConfig } from "../types/types"
 
-abstract class MapLayer {
+class MapLayer extends EventTarget {
 	glmap: GLMap
 	context: WebGL2RenderingContext
 
-	centerX = 0
-	centerY = 0
-	zoom = 0
-	width = 0
-	height = 0
-
 	constructor(config: MapLayerConfig) {
+		super()
+
 		const {
 			glmap,
 			context
@@ -21,40 +17,27 @@ abstract class MapLayer {
 		this.context = context
 	}
 
-	setCenter(centerX: number, centerY: number) {
-		if (centerX !== this.centerX || centerY !== this.centerY) {
-			this.centerX = centerX
-			this.centerY = centerY
-			this.onPan(centerX, centerY)
-		}
+	get centerX() {
+		return this.glmap.centerX
 	}
 
-	setZoom(zoom: number) {
-		if (zoom !== this.zoom) {
-			this.zoom = zoom
-			this.onZoom(zoom)
-		}
+	get centerY() {
+		return this.glmap.centerY
 	}
 
-	setResolution(width: number, height: number) {
-		if (width !== this.width || height !== this.height) {
-			this.width = width
-			this.height = height
-			this.onResize(width, height)
-		}
+	get zoom() {
+		return this.glmap.zoom
 	}
 
-	abstract onPan(newCenterX: number, newCenterY: number): void
+	get width() {
+		return this.glmap.resolutionWidth
+	}
 
-	abstract onZoom(newZoom: number): void
+	get height() {
+		return this.glmap.resolutionHeight
+	}
 
-	abstract onResize(newWidth: number, newHeight: number): void
-
-	abstract onHover(pointerX: number, pointerY: number): void
-
-	abstract onClick(pointerX: number, pointerY: number): void
-
-	abstract render(time: number): void
+	render(time: number) {}
 }
 
 export { MapLayer }

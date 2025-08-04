@@ -7,6 +7,10 @@ import type { MarkerLayerConfig } from "../types/types.ts"
 import { Icon } from "../wrapper/Icon"
 import type { Marker } from "../wrapper/Marker"
 
+import type { CoordEvent } from "../events/CoordEvent.ts"
+import type { ZoomEvent } from "../events/ZoomEvent.ts"
+import type { ResizeEvent } from "../events/ResizeEvent.ts"
+
 
 class MarkerLayer extends MapLayer {
 	markerProgram: MarkerProgram
@@ -26,6 +30,12 @@ class MarkerLayer extends MapLayer {
 			maxIconCount
 		} = config
 
+		this.addEventListener("pan", this.onPan as EventListener)
+		this.addEventListener("zoom", this.onZoom as EventListener)
+		this.addEventListener("resize", this.onResize as EventListener)
+		this.addEventListener("click", this.onClick as EventListener)
+		this.addEventListener("hover", this.onHover as EventListener)
+
 		// Setup shader program
 		let mp = new MarkerProgram(context)
 		this.markerProgram = mp
@@ -36,33 +46,35 @@ class MarkerLayer extends MapLayer {
 		mp.setIconDataTexture(this.iconStorage.getDataTextureBinding())
 	}
 
-	onPan(x: number, y: number) {
+	onPan(panEvent: CoordEvent) {
 		this.markerProgram.activate()
-		this.markerProgram.setCenter(x, y)
+		this.markerProgram.setCenter(panEvent.x, panEvent.y)
 	}
 
-	onZoom(z: number) {
+	onZoom(zoomEvent: ZoomEvent) {
 		this.markerProgram.activate()
-		this.markerProgram.setZoom(z)
+		this.markerProgram.setZoom(zoomEvent.zoom)
 	}
 
-	onResize(w: number, h: number) {
+	onResize(resizeEvent: ResizeEvent) {
 		this.markerProgram.activate()
-		this.markerProgram.setResolution(w, h)
+		this.markerProgram.setResolution(resizeEvent.width, resizeEvent.height)
 	}
 
-	onClick(x: number, y: number) {
-		let marker = this.findMarkerAt(x, y)
+	onClick(clickEvent: CoordEvent) {
+		let marker = this.findMarkerAt(clickEvent.x, clickEvent.y)
 		if (marker) {
+			clickEvent.preventDefault()
 			marker.onClick()
 		}
 	}
 
-	onHover(x: number, y: number) {
+	onHover(hoverEvent: CoordEvent) {
 		let canvasClasses = this.glmap.getCanvasElement().classList
 
-		let marker = this.findMarkerAt(x, y)
+		let marker = this.findMarkerAt(hoverEvent.x, hoverEvent.y)
 		if (marker) {
+			hoverEvent.preventDefault()
 			canvasClasses.add("glmap-marker-hover")
 		} else {
 			canvasClasses.remove("glmap-marker-hover")

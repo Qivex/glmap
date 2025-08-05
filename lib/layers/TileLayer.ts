@@ -10,13 +10,6 @@ import type { ZoomEvent } from "../events/ZoomEvent.ts"
 import type { ResizeEvent } from "../events/ResizeEvent.ts"
 
 
-
-// TODO: From config
-const PADDING = 0	// Used to fetch tiles outside of viewport (avoid empty tiles)
-
-const MAX_TILE_CREATIONS_PER_FRAME = 8	// Empiric: 256x256 tiles take 1-2ms -> ~8 tiles @ 60fps are usually safe
-
-
 function compareTileBounds(t1: TileBoundsType, t2: TileBoundsType) {
 	return (t1.minX === t2.minX &&
 			t1.maxX === t2.maxX &&
@@ -36,6 +29,10 @@ function compareTilePositions(t1: TilePositionType, t2: TilePositionType) {
 class TileLayer extends MapLayer {
 	tileWidth = 256
 	tileHeight = 256
+
+	// Experimental settings
+	_tileFetchPadding = 0	// Fetch tiles outside of visible viewport to avoid missing tiles
+	_tileCreationCountPerFrame = 8	// Limit tile creation to avoid texture upload bottleneck
 
 	tileProgram: TileProgram
 	tileSource: TileSource
@@ -62,9 +59,11 @@ class TileLayer extends MapLayer {
 			tileWidth = 256,
 			tileHeight = 256,
 			tileURL,
-			tileLimits
+			tileLimits,
+			_tileFetchPadding = 0,
+			_tileCreationCountPerFrame = 8
 		} = config
-		Object.assign(this, {tileWidth, tileHeight, tileLimits})
+		Object.assign(this, {tileWidth, tileHeight, tileLimits, _tileFetchPadding, _tileCreationCountPerFrame})
 		
 		// Create tile source & force initial calculation + fetch
 		this.tileSource = new TileSource(tileURL)
@@ -118,8 +117,8 @@ class TileLayer extends MapLayer {
 		let viewScale = Math.pow(2, this.zoom)
 
 		// Add padding to viewport
-		let paddedWidth  = (this.width  / 2 + PADDING) / viewScale,
-			paddedHeight = (this.height / 2 + PADDING) / viewScale
+		let paddedWidth  = (this.width  / 2 + this._tileFetchPadding) / viewScale,
+			paddedHeight = (this.height / 2 + this._tileFetchPadding) / viewScale
 
 		let requiredArea = {
 			minX: this.centerX - paddedWidth,
@@ -228,7 +227,7 @@ class TileLayer extends MapLayer {
 
 			// Limit tiles created per frame to avoid dropped frames
 			// Deep Dive: texSubImage3d acts synchronous on the GPU - only 1 buffer is written to the texture at any time
-			for (let i = 0; i < MAX_TILE_CREATIONS_PER_FRAME; i++) {
+			for (let i = 0; i < this._tileCreationCountPerFrame; i++) {
 				let queueItem = this.tileCreateQueue.pop()
 				if (queueItem === undefined) {
 					this.hasUpdatedTiles = false	// Only set when queue is empty

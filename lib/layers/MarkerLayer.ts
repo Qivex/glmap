@@ -2,7 +2,7 @@ import { MapLayer } from "./MapLayer"
 import { MarkerProgram } from "../programs/MarkerProgram"
 import { IconStorage } from "../storage/IconStorage"
 
-import type { MarkerLayerConfig } from "../types/types.ts"
+import type { MarkerLayerConfig, IconHitTestType } from "../types/types.ts"
 
 import { Icon } from "../wrapper/Icon"
 import type { Marker } from "../wrapper/Marker"
@@ -18,6 +18,9 @@ class MarkerLayer extends MapLayer {
 
 	activeMarkers: Set<Marker> = new Set()
 
+	iconHitTest: IconHitTestType
+	alphaTestFramebuffer: WebGLFramebuffer | null
+
 	hasUpdatedMarkers = false
 
 	constructor(config: MarkerLayerConfig) {
@@ -27,8 +30,11 @@ class MarkerLayer extends MapLayer {
 			context,
 			maxIconWidth,
 			maxIconHeight,
-			maxIconCount
+			maxIconCount,
+			iconHitTest = "box"
 		} = config
+
+		this.iconHitTest = iconHitTest
 
 		this.addEventListener("pan", this.onPan as EventListener)
 		this.addEventListener("zoom", this.onZoom as EventListener)
@@ -50,6 +56,10 @@ class MarkerLayer extends MapLayer {
 		this.iconStorage = new IconStorage(context, maxIconCount, maxIconWidth, maxIconHeight)
 		mp.setMarkerTexture(this.iconStorage.getTextureBinding())	// Should never change
 		mp.setIconDataTexture(this.iconStorage.getDataTextureBinding())
+
+		// Create framebuffer to attach icon texture for alpha test
+		let gl = this.context
+		this.alphaTestFramebuffer = gl.createFramebuffer()
 	}
 
 	onPan(panEvent: CoordEvent) {
@@ -92,7 +102,7 @@ class MarkerLayer extends MapLayer {
 
 	createIcon(image: CanvasImageSource, width: number, height: number, anchorX: number, anchorY: number) {
 		let iconIndex = this.iconStorage.createIcon(image, width, height, anchorX, anchorY)
-		return new Icon(this.iconStorage, iconIndex)
+		return new Icon(this.iconStorage, iconIndex, width, height, anchorX, anchorY)
 	}
 
 	addMarker(marker: Marker) {
@@ -121,20 +131,50 @@ class MarkerLayer extends MapLayer {
 	findMarkerAt(x: number, y: number) {
 		let marker = this.findClosestMarker(x, y)
 		if (marker) {
-			// Hit test - For now just matching circle
-			// TODO: Give choice: circle, bounding box, alpha != 0 etc.
+			// Compare both positions
 			let markerCanvasPos = this.glmap.map2canvas(marker.x, marker.y)
 			let pointerCanvasPos = this.glmap.map2canvas(x, y)
-
-			let distancePixels = Math.sqrt(
-				Math.pow(markerCanvasPos.x - pointerCanvasPos.x, 2) +
-				Math.pow(markerCanvasPos.y - pointerCanvasPos.y, 2)
-			)
-
-			if (distancePixels < 16)
+			// scale = texture size / rendered size
+			let icon = marker.icon
+			let hIconScale = this.iconStorage.maxWidth  / icon.width
+			let vIconScale = this.iconStorage.maxHeight / icon.height
+			// Determine equivalent pixel in icon texture
+			let testX = hIconScale * (pointerCanvasPos.x - markerCanvasPos.x + icon.anchorX)
+			let testY = vIconScale * (pointerCanvasPos.y - markerCanvasPos.y + icon.anchorY)
+			// Execute hit test: Does the pointer "hit" the marker?
+			let isHit = false
+			switch (this.iconHitTest) {
+				case "alpha": {
+					isHit = this.alphaHitTest(icon, testX, testY)
+					break
+				}
+				case "box": {
+					isHit = (
+						testX > 0 &&
+						testY > 0 &&
+						testX < this.iconStorage.maxWidth &&
+						testY < this.iconStorage.maxHeight
+					)
+				}
+			}
+			if (isHit)
 				return marker
 		}
 		return null
+	}
+
+	alphaHitTest(icon: Icon, x: number, y: number) {
+		let gl = this.context
+		// Attach marker icon
+		gl.bindFramebuffer(gl.FRAMEBUFFER, this.alphaTestFramebuffer)
+		gl.framebufferTextureLayer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, this.iconStorage.getTextureBinding(), 0, icon.slot)
+		// Read pixel value
+		let pixel = new Uint8Array(4)
+		gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel)
+		// Bind to canvas again
+		gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+		// Alpha test
+		return pixel[3] > 0
 	}
 
 	render(time: number) {

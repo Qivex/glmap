@@ -63,7 +63,8 @@ class SimpleGLMap extends GLMap {
 			context: this.context,
 			maxIconCount: 16,
 			maxIconWidth: 32,
-			maxIconHeight: 32
+			maxIconHeight: 32,
+			iconHitTest: "alpha"
 		})
 		this.addMapLayer(this.markerLayer)
 
@@ -79,8 +80,10 @@ class SimpleGLMap extends GLMap {
 		let icons = ["red", "lime", "blue", "yellow", "purple", "black"].map(color => {
 			// Draw some test icon
 			ctx.strokeStyle = color
+			ctx.fillStyle = "rgba(0,0,0,0.004)"	// Barely visible, but enough to pass alpha hit test
 			ctx.lineWidth = 2
 			ctx.ellipse(16, 16, 15, 15, 0, 0, 2*Math.PI, false)
+			ctx.fill()
 			ctx.stroke()
 			/* Note: Neither width of image nor width parameter need to match maxIconWidth/Height:
 			- Image is scaled before storage

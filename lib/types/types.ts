@@ -3,6 +3,8 @@ import type { GLMap } from "../GLMap"
 
 type Lookup<Type> = {[key: string]: Type}
 
+type IconHitTestType = "box" | "alpha"
+
 
 // Config tree
 interface MapLayerConfig {
@@ -13,7 +15,8 @@ interface MapLayerConfig {
 interface MarkerLayerConfig extends MapLayerConfig {
 	maxIconWidth: number,
 	maxIconHeight: number,
-	maxIconCount: number
+	maxIconCount: number,
+	iconHitTest?: IconHitTestType
 }
 
 interface TileLayerConfig extends MapLayerConfig {
@@ -67,6 +70,7 @@ interface ZoomEventInit extends EventInit {
 
 export type {
 	Lookup,
+	IconHitTestType,
 
 	MapLayerConfig,
 	MarkerLayerConfig,

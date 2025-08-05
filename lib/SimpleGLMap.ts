@@ -63,8 +63,7 @@ class SimpleGLMap extends GLMap {
 			context: this.context,
 			maxIconCount: 16,
 			maxIconWidth: 32,
-			maxIconHeight: 32,
-			iconHitTest: "alpha"
+			maxIconHeight: 32
 		})
 		this.addMapLayer(this.markerLayer)
 

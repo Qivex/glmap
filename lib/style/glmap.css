@@ -5,7 +5,7 @@
 	}
 
 	.glmap.glmap-drag {
-		cursor: grabbing;
+		cursor: grabbing!important;	/* higher priority than hover */
 	}
 
 	.glmap.glmap-marker-hover {

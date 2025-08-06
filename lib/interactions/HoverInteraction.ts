@@ -6,8 +6,7 @@ class HoverInteraction extends UserInteraction {
 	enableFor(glmap: GLMap) {
 		super.enableFor(glmap)
 
-		const hoverHandler = (event: Event) => {
-			const moveEvent = event as PointerEvent
+		const hoverHandler = (moveEvent: PointerEvent) => {
 			let hoverPos = glmap.canvas2map(moveEvent.offsetX, moveEvent.offsetY)
 			glmap.onHover(hoverPos.x, hoverPos.y)
 		}

@@ -21,8 +21,10 @@ class GLMap extends CanvasContext {
 	constructor(canvasElement: HTMLCanvasElement) {
 		super(canvasElement)
 
-		this.resolutionWidth = this.context.drawingBufferWidth
-		this.resolutionHeight =  this.context.drawingBufferHeight
+		let gl = this.context
+		gl.clearColor(0, 0, 0, 0)
+		this.resolutionWidth = gl.drawingBufferWidth
+		this.resolutionHeight =  gl.drawingBufferHeight
 
 		let render = (time: number) => {
 			this.render(time)
@@ -118,7 +120,6 @@ class GLMap extends CanvasContext {
 		}
 
 		gl.viewport(0, 0, w, h)
-		gl.clearColor(0, 0, 0, 0)
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
 		for (let layer of this.layers) {

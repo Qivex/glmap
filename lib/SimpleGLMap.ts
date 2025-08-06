@@ -142,7 +142,7 @@ class SimpleGLMap extends GLMap {
 	}
 
 	testClick() {
-		this.addUserInteraction(new ClickInteraction())
+		this.addUserInteraction(new ClickInteraction({dragLimit: 16}))
 	}
 }
 

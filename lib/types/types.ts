@@ -1,4 +1,5 @@
 import type { GLMap } from "../GLMap"
+import type { TilePosition } from "./TilePosition"
 
 
 type Lookup<Type> = {[key: string]: Type}
@@ -39,15 +40,9 @@ type TileBoundsType = {
 	maxZoom: number
 }
 
-type TilePositionType = {
-	x: number,
-	y: number,
-	z: number
-}
-
 type QueueItemType = {
 	image: HTMLImageElement,
-	tile: TilePositionType
+	tile: TilePosition
 }
 
 
@@ -77,7 +72,6 @@ export type {
 	TileLayerConfig,
 
 	TileBoundsType,
-	TilePositionType,
 	QueueItemType,
 
 	CoordEventInit,

@@ -3,8 +3,9 @@ import { MapLayer } from "./MapLayer.ts"
 import { TileProgram } from "../programs/TileProgram.ts"
 import { TileSource } from "../TileSource.ts"
 import { TileStorage } from "../storage/TileStorage.ts"
+import { TilePosition } from "../types/TilePosition.ts"
 
-import type { TileLayerConfig, TileBoundsType, TilePositionType, QueueItemType } from "../types/types.ts"
+import type { TileLayerConfig, TileBoundsType, QueueItemType } from "../types/types.ts"
 import type { CoordEvent } from "../events/CoordEvent.ts"
 import type { ZoomEvent } from "../events/ZoomEvent.ts"
 import type { ResizeEvent } from "../events/ResizeEvent.ts"
@@ -17,12 +18,6 @@ function compareTileBounds(t1: TileBoundsType, t2: TileBoundsType) {
 			t1.maxY === t2.maxY &&
 			t1.minZoom === t2.minZoom &&
 			t1.maxZoom === t2.maxZoom)
-}
-
-function compareTilePositions(t1: TilePositionType, t2: TilePositionType) {
-	return (t1.x === t2.x &&
-			t1.y === t2.y &&
-			t1.z === t2.z)
 }
 
 
@@ -41,7 +36,8 @@ class TileLayer extends MapLayer {
 	hasUpdatedArea = false
 	hasUpdatedTiles = false
 
-	requiredTiles: Array<TilePositionType> = []
+	requiredTiles: Array<TilePosition> = []
+	pendingTileIDs: Set<string> = new Set()
 	tileCreateQueue: Array<QueueItemType> = []
 
 	tileBounds: TileBoundsType = {minX: 0, maxX: 0, minY: 0, maxY: 0, minZoom: 0, maxZoom: 0}	// Tiles for current view
@@ -169,7 +165,7 @@ class TileLayer extends MapLayer {
 		for (let z = maxZoom; z >= minZoom; z--) {
 			for (let x = minX; x <= maxX; x++) {
 				for (let y = minY; y <= maxY; y++) {
-					this.requiredTiles.push({x, y, z})
+					this.requiredTiles.push(new TilePosition(x, y, z))
 				}
 			}
 
@@ -182,25 +178,18 @@ class TileLayer extends MapLayer {
 	}
 
 	fetchMissingTiles() {
-			// Check available tiles
-			let missingTiles = []
-			for (let tile of this.requiredTiles) {
-				let slot = this.tileStorage.findTile(tile)
-				if (!slot)
-					missingTiles.push(tile)
-			}
-			
-			// TODO: Order by importance (lowest zoom, center of view etc.)
-			missingTiles.reverse()
-
-			// Fetch tiles
-			for (let tile of missingTiles) {
-				this.tileSource.fetchTile(tile.x, tile.y, tile.z)
-					.then(image => {
-						this.hasUpdatedTiles = true
-						this.tileCreateQueue.push({image, tile})
-					})
-			}
+			this.requiredTiles
+				.filter(tile => !this.tileStorage.hasTile(tile))
+				.filter(tile => !this.pendingTileIDs.has(tile.toString()))
+				.reverse()	// Improvised sort by importance -> Lower zoom levels first
+				.forEach(tile => {
+					this.pendingTileIDs.add(tile.toString())
+					this.tileSource.fetchTile(tile.x, tile.y, tile.z)
+						.then(image => {
+							this.hasUpdatedTiles = true
+							this.tileCreateQueue.push({image, tile})
+						})
+				})
 	}
 
 	render() {
@@ -230,12 +219,15 @@ class TileLayer extends MapLayer {
 			for (let i = 0; i < this._tileCreationCountPerFrame; i++) {
 				let queueItem = this.tileCreateQueue.pop()
 				if (queueItem === undefined) {
-					this.hasUpdatedTiles = false	// Only set when queue is empty
+					this.hasUpdatedTiles = false	// Only after queue has been emptied
 					break
 				}
+
 				// Skip if no longer required (= when requiredTiles changed before download finished)
-				if (this.requiredTiles.some(tile => compareTilePositions(queueItem.tile, tile)))
+				if (this.requiredTiles.some(tile => tile.equals(queueItem.tile)))
 					this.tileStorage.createTile(queueItem.image, queueItem.tile)
+
+				this.pendingTileIDs.delete(queueItem.tile.toString())
 			}
 
 			let {slices, positions} = this.tileStorage.constructBufferDataForTiles()

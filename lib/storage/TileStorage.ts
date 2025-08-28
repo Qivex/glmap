@@ -1,32 +1,28 @@
 import { TextureStorage } from "./TextureStorage"
 
-import type { TilePositionType } from "../types/types"
+import type { TilePosition } from "../types/TilePosition"
 
-
-function equalPos(p1: TilePositionType, p2: TilePositionType) {
-	return p1 && p2 && p1.x === p2.x && p1.y === p2.y && p1.z === p2.z
-}
 
 class TileStorage extends TextureStorage {
-	tilePositions: Array<TilePositionType> = []
+	tilePositions: Array<TilePosition> = []
 
 	constructor(context: WebGL2RenderingContext, tileWidth: number, tileHeight: number) {
-		super(context, tileWidth, tileHeight, 256)
+		super(context, tileWidth, tileHeight, 256)	// TODO: Calculate based on canvas- & tile size
 	}
 
-	createTile(image: TexImageSource, tile: TilePositionType) {
+	createTile(image: TexImageSource, tile: TilePosition) {
 		let slot = this.addTexture(image)
 		this.tilePositions[slot] = tile
 		return slot
 	}
 
-	findTile(pos: TilePositionType) {
-		return this.tilePositions.some(t => equalPos(t, pos))
+	hasTile(pos: TilePosition) {
+		return this.tilePositions.some(t => t.equals(pos))
 	}
 
-	removeTilesExceptRequired(requiredTiles: Array<TilePositionType>) {
+	removeTilesExceptRequired(requiredTiles: Array<TilePosition>) {
 		this.tilePositions.forEach((pos, slot) => {
-			if (!requiredTiles.some(r => equalPos(r, pos))) {
+			if (!requiredTiles.some(r => r.equals(pos))) {
 				delete this.tilePositions[slot]
 				this.removeTexture(slot)
 			}

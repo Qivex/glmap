@@ -17,11 +17,15 @@ import style from "./style/glmap.css?raw"
 import { CircleLayer } from "../examples/circle-layer/CircleLayer"
 import { Circle } from "../examples/circle-layer/Circle"
 
+import { ArrowLayer } from "../examples/arrow-layer/ArrowLayer"
+import { Arrow } from "../examples/arrow-layer/Arrow"
+
 class SimpleGLMap extends GLMap {
 	tileLayer: TileLayer
 	markerLayer: MarkerLayer
 	popupLayer: PopupLayer
 	circleLayer: CircleLayer
+	arrowLayer: ArrowLayer
 
 
 	constructor(canvasElement: HTMLCanvasElement) {
@@ -127,6 +131,17 @@ class SimpleGLMap extends GLMap {
 		this.addMapLayer(this.circleLayer)
 
 		this.circleLayer.addCircle(new Circle({center: [64,128], radius: 5, color: [1,1,0,0.2]}))
+	}
+
+	testArrow() {
+		this.arrowLayer = new ArrowLayer({
+			glmap: this,
+			context: this.context
+		})
+		this.addMapLayer(this.arrowLayer)
+
+		this.arrowLayer.addArrow(new Arrow({startPoint: [64,128], endPoint: [72,130], lineWidth: 4, headPeriod: 40}))
+		this.arrowLayer.addArrow(new Arrow({startPoint: [70,120], endPoint: [77,137], headSize: [40,40], lineWidth: 7}))
 	}
 
 	testZooming() {

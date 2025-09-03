@@ -110,7 +110,9 @@ class SimpleGLMap extends GLMap {
 		})
 		this.addMapLayer(this.popupLayer)
 
-		let testPopup = new Popup(document.getElementById("popup"), 50, 25)
+		let popupElement = document.getElementById("popup")
+		if (popupElement === null) return
+		let testPopup = new Popup(popupElement, 50, 25)
 
 		for (let marker of this.markerLayer.activeMarkers) {
 			marker.addEventListener("click", () => {
@@ -136,12 +138,16 @@ class SimpleGLMap extends GLMap {
 	testArrow() {
 		this.arrowLayer = new ArrowLayer({
 			glmap: this,
-			context: this.context
+			context: this.context,
+			lineWidth: 6,
+			arrowPeriod: 120,
+			arrowWidth: 32,
+			arrowHeight: 32
 		})
 		this.addMapLayer(this.arrowLayer)
 
-		this.arrowLayer.addArrow(new Arrow({startPoint: [64,128], endPoint: [72,130], lineWidth: 4, headPeriod: 40}))
-		this.arrowLayer.addArrow(new Arrow({startPoint: [70,120], endPoint: [77,137], headSize: [40,40], lineWidth: 7}))
+		this.arrowLayer.addArrow(new Arrow({startPoint: [64,128], endPoint: [72,130], color: [1,1,1,1]}))
+		this.arrowLayer.addArrow(new Arrow({startPoint: [70,120], endPoint: [77,137], color: [0,1,0,1]}))
 	}
 
 	testZooming() {

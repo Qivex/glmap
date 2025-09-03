@@ -5,9 +5,8 @@ precision highp float;
 uniform vec2 resolution;
 uniform vec2 center;
 uniform float zoom;
-
 uniform float lineWidth;
-uniform vec2 headSize;
+uniform float headWidth;
 
 in vec2 vertexPos;
 in vec4 arrowCoords;
@@ -15,7 +14,6 @@ in vec4 color;
 
 out vec2 uv;
 out vec4 rgba;
-out float headHeight;
 out vec2 lineInterval;
 out float arrowLength;
 
@@ -23,9 +21,6 @@ void main() {
 	// Common varyings
 	uv = vertexPos;
 	rgba = color;
-	// Destructured head size
-	float headWidth = headSize.x;
-	headHeight = headSize.y;
 	// Line thickness
 	float uvLineHalf = 0.5 * lineWidth / headWidth;
 	lineInterval = vec2(0.5 - uvLineHalf,0.5 + uvLineHalf);

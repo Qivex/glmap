@@ -18,6 +18,20 @@ interface ArrowLayerConfig extends MapLayerConfig {
 }
 
 
+// Default arrow
+let defaultArrow = new OffscreenCanvas(20, 20)
+let ctx = defaultArrow.getContext("2d")
+if (ctx === null)
+	throw new Error("Context creation failed")
+ctx.fillStyle = "white"
+ctx.beginPath()
+ctx.moveTo(19,10)
+ctx.lineTo(1,19)
+ctx.lineTo(1,1)
+ctx.closePath()
+ctx.fill()
+
+
 class ArrowLayer extends MapLayer {
 	arrowProgram: ArrowProgram
 	arrows: Set<Arrow> = new Set()
@@ -29,10 +43,10 @@ class ArrowLayer extends MapLayer {
 		const {
 			context,
 			lineWidth = 4,
-			arrowPeriod = 100,
+			arrowPeriod = 80,
 			arrowWidth = 20,
 			arrowHeight = 20,
-			arrowShape
+			arrowShape = defaultArrow
 		} = config
 
 		this.arrowProgram = new ArrowProgram(context)
@@ -45,7 +59,7 @@ class ArrowLayer extends MapLayer {
 		ap.setResolution(this.width, this.height)
 		ap.setLineWidth(lineWidth)
 		ap.setArrowPeriod(arrowPeriod)
-		ap.setArrowHead(arrowWidth, arrowHeight)
+		ap.setArrowHead(arrowWidth, arrowHeight, arrowShape)
 
 		// React to state changes
 		this.addEventListener("pan", this.onPan as EventListener)

@@ -11,7 +11,8 @@ class ArrowProgram extends ShaderProgram {
 	zoomUniformLocation: WebGLUniformLocation | null
 	lineWidthUniformLocation: WebGLUniformLocation | null
 	headPeriodUnformLocation: WebGLUniformLocation | null
-	headSizeUniformLocation: WebGLUniformLocation | null
+	headWidthUniformLocation: WebGLUniformLocation | null
+	headHeightUniformLocation: WebGLUniformLocation | null
 
 	vertexPosAttributeLocation: number
 	arrowCoordsAttributeLocation: number
@@ -24,6 +25,7 @@ class ArrowProgram extends ShaderProgram {
 	colorBuffer: WebGLBuffer | null
 
 	arrowCount = 0
+	texture: WebGLTexture
 
 	constructor(context: WebGL2RenderingContext) {
 		super(context)
@@ -36,7 +38,8 @@ class ArrowProgram extends ShaderProgram {
 		this.zoomUniformLocation       = gl.getUniformLocation(this.program, "zoom")
 		this.lineWidthUniformLocation  = gl.getUniformLocation(this.program, "lineWidth")
 		this.headPeriodUnformLocation  = gl.getUniformLocation(this.program, "headPeriod")
-		this.headSizeUniformLocation   = gl.getUniformLocation(this.program, "headSize")
+		this.headWidthUniformLocation  = gl.getUniformLocation(this.program, "headWidth")
+		this.headHeightUniformLocation = gl.getUniformLocation(this.program, "headHeight")
 
 		// Store attributes
 		this.attributeArray = gl.createVertexArray()
@@ -89,9 +92,21 @@ class ArrowProgram extends ShaderProgram {
 		this.context.uniform1f(this.headPeriodUnformLocation, period)
 	}
 
-	setArrowHead(width: number, height: number) {
-		this.context.uniform2f(this.headSizeUniformLocation, width, height)
-		// TODO: Create alpha texture from shape image
+	setArrowHead(width: number, height: number, shape: TexImageSource) {
+		let gl = this.context
+		gl.uniform1f(this.headWidthUniformLocation, width)
+		gl.uniform1f(this.headHeightUniformLocation, height)
+		// TODO: Shape texture is only required for alpha, RGBA is wasteful
+		let texture = gl.createTexture()
+		if (texture === null)
+			throw new Error("Texture creation failed")
+		gl.bindTexture(gl.TEXTURE_2D, texture)
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, shape)
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+		this.texture = texture
 	}
 
 	// Attribute buffer setter
@@ -115,6 +130,8 @@ class ArrowProgram extends ShaderProgram {
 
 	draw() {
 		let gl = this.context
+		gl.activeTexture(gl.TEXTURE0)
+		gl.bindTexture(gl.TEXTURE_2D, this.texture)
 		gl.bindVertexArray(this.attributeArray)
 		gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, this.arrowCount)
 	}

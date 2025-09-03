@@ -136,13 +136,11 @@ class SimpleGLMap extends GLMap {
 	}
 
 	testArrow() {
+		
+		
 		this.arrowLayer = new ArrowLayer({
 			glmap: this,
-			context: this.context,
-			lineWidth: 6,
-			arrowPeriod: 120,
-			arrowWidth: 32,
-			arrowHeight: 32
+			context: this.context
 		})
 		this.addMapLayer(this.arrowLayer)
 

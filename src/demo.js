@@ -10,10 +10,10 @@ resizeCanvas()
 
 let m = new GLMap(canvas)
 m.testTiles()
-//m.testCircle()
+m.testCircle()
 m.testArrow()
-//m.testMarker()
-//m.testPopup()
+m.testMarker()
+m.testPopup()
 
 m.testZooming()
 m.testHover()

@@ -188,6 +188,7 @@ class TileLayer extends MapLayer {
 						.then(image => {
 							this.hasUpdatedTiles = true
 							this.tileCreateQueue.push({image, tile})
+							this.requireRender()
 						})
 				})
 	}

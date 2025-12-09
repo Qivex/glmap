@@ -37,6 +37,10 @@ class MapLayer extends EventTarget {
 		return this.glmap.resolutionHeight
 	}
 
+	requireRender() {
+		this.glmap.requireRender()
+	}
+
 	render(time: number) {}
 }
 

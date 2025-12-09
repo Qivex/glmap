@@ -18,6 +18,8 @@ class GLMap extends CanvasContext {
 	resolutionWidth: number
 	resolutionHeight: number
 
+	renderRequired = true
+
 	constructor(canvasElement: HTMLCanvasElement) {
 		super(canvasElement)
 
@@ -35,6 +37,7 @@ class GLMap extends CanvasContext {
 
 	addMapLayer(layer: MapLayer) {
 		this.layers.push(layer)
+		this.requireRender()
 	}
 
 	addUserInteraction(interaction: UserInteraction) {
@@ -43,6 +46,8 @@ class GLMap extends CanvasContext {
 	}
 
 	dispatchEventToLayers(event: Event) {
+		// Assume all events require re-render except HoverEvent
+		if (event.type !== "hover") this.requireRender()
 		// Reverse order because top layer is (rendered) last
 		for (let layer of this.layers.toReversed()) {
 			let shouldPropagate = layer.dispatchEvent(event)
@@ -107,6 +112,10 @@ class GLMap extends CanvasContext {
 		}
 	}
 
+	requireRender() {
+		this.renderRequired = true
+	}
+
 	render(time: number) {
 		let gl = this.context
 
@@ -119,12 +128,19 @@ class GLMap extends CanvasContext {
 			this.dispatchEventToLayers(new ResizeEvent("resize", {width: w, height: h}))
 		}
 
+		// Skip rendering when idle
+		if (this.renderRequired === false) return
+
+		console.log("render")
+
 		gl.viewport(0, 0, w, h)
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
 		for (let layer of this.layers) {
 			layer.render(time)
 		}
+
+		this.renderRequired = false
 	}
 }
 

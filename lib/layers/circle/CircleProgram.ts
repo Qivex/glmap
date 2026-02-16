@@ -1,4 +1,4 @@
-import { ShaderProgram } from "../../lib/programs/ShaderProgram"
+import { ShaderProgram } from "../../ShaderProgram"
 
 import vs from "./shader/circle.vertex.glsl?raw"
 import fs from "./shader/circle.fragment.glsl?raw"

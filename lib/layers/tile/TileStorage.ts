@@ -1,6 +1,6 @@
-import { TextureStorage } from "./TextureStorage"
+import { TextureStorage } from "../../TextureStorage"
 
-import type { TilePosition } from "../types/TilePosition"
+import type { TilePosition } from "../../types/TilePosition"
 
 
 class TileStorage extends TextureStorage {

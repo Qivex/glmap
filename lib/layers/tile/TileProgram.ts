@@ -1,7 +1,7 @@
-import { ShaderProgram } from "./ShaderProgram"
+import { ShaderProgram } from "../../ShaderProgram"
 
-import vs from "../glsl/tile.vertex.glsl?raw"
-import fs from "../glsl/tile.fragment.glsl?raw"
+import vs from "./shader/tile.vertex.glsl?raw"
+import fs from "./shader/tile.fragment.glsl?raw"
 
 class TileProgram extends ShaderProgram {
 	resolutionUniformLocation: WebGLUniformLocation | null

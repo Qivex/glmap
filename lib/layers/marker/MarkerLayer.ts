@@ -1,15 +1,15 @@
-import { MapLayer } from "./MapLayer"
-import { MarkerProgram } from "../programs/MarkerProgram"
-import { IconStorage } from "../storage/IconStorage"
+import { MapLayer } from "../../MapLayer.ts"
+import { MarkerProgram } from "./MarkerProgram"
+import { IconStorage } from "./IconStorage.ts"
 
-import type { MarkerLayerConfig, IconHitTestType } from "../types/types.ts"
+import type { MarkerLayerConfig, IconHitTestType } from "../../types/types.ts"
 
-import { Icon } from "../wrapper/Icon"
-import type { Marker } from "../wrapper/Marker"
+import { Icon } from "./Icon.ts"
+import type { Marker } from "./Marker.ts"
 
-import { CoordEvent } from "../events/CoordEvent.ts"
-import type { ZoomEvent } from "../events/ZoomEvent.ts"
-import type { ResizeEvent } from "../events/ResizeEvent.ts"
+import { CoordEvent } from "../../events/CoordEvent.ts"
+import type { ZoomEvent } from "../../events/ZoomEvent.ts"
+import type { ResizeEvent } from "../../events/ResizeEvent.ts"
 
 
 class MarkerLayer extends MapLayer {

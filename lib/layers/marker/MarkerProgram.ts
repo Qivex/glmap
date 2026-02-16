@@ -1,7 +1,7 @@
-import { ShaderProgram } from "./ShaderProgram"
+import { ShaderProgram } from "../../ShaderProgram"
 
-import vs from "../glsl/marker.vertex.glsl?raw"
-import fs from "../glsl/marker.fragment.glsl?raw"
+import vs from "./shader/marker.vertex.glsl?raw"
+import fs from "./shader/marker.fragment.glsl?raw"
 
 class MarkerProgram extends ShaderProgram {
 	resolutionUniformLocation: WebGLUniformLocation | null

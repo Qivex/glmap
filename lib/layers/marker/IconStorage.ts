@@ -1,5 +1,5 @@
-import { TextureStorage } from "./TextureStorage"
-import { DataTexture } from "../DataTexture"
+import { TextureStorage } from "../../TextureStorage"
+import { DataTexture } from "../../DataTexture"
 
 class IconStorage extends TextureStorage {
 	// Stores iconSize & iconAnchor

@@ -1,12 +1,12 @@
-import { MapLayer } from "../../lib/layers/MapLayer"
-import type { MapLayerConfig } from "../../lib/types/types"
+import { MapLayer } from "../../MapLayer"
+import type { MapLayerConfig } from "../../types/types"
 
 import { Arrow } from "./Arrow"
 import { ArrowProgram } from "./ArrowProgram"
 
-import type { CoordEvent } from "../../lib/events/CoordEvent"
-import type { ZoomEvent } from "../../lib/events/ZoomEvent"
-import type { ResizeEvent } from "../../lib/events/ResizeEvent"
+import type { CoordEvent } from "../../events/CoordEvent"
+import type { ZoomEvent } from "../../events/ZoomEvent"
+import type { ResizeEvent } from "../../events/ResizeEvent"
 
 
 interface ArrowLayerConfig extends MapLayerConfig {

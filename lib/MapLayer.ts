@@ -1,5 +1,5 @@
-import type { GLMap } from "../GLMap"
-import type { MapLayerConfig } from "../types/types"
+import type { GLMap } from "./GLMap"
+import type { MapLayerConfig } from "./types/types"
 
 class MapLayer extends EventTarget {
 	glmap: GLMap

@@ -1,7 +1,7 @@
-import { MapLayer } from "./MapLayer"
+import { MapLayer } from "../../MapLayer"
 
-import type { MapLayerConfig } from "../types/types"
-import type { Popup } from "../Popup"
+import type { MapLayerConfig } from "../../types/types"
+import type { Popup } from "./Popup"
 
 class PopupLayer extends MapLayer { 
 	openPopups: Map<HTMLElement, Popup> = new Map()

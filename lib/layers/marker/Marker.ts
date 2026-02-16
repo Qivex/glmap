@@ -1,4 +1,4 @@
-import type { MarkerLayer } from "../layers/MarkerLayer"
+import type { MarkerLayer } from "./MarkerLayer"
 import type { Icon } from "./Icon"
 
 class Marker extends EventTarget {

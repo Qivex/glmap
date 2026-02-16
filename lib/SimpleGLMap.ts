@@ -1,11 +1,11 @@
 import { GLMap } from "./GLMap"
 
-import { TileLayer } from "./layers/TileLayer"
-import { MarkerLayer } from "./layers/MarkerLayer"
-import { PopupLayer } from "./layers/PopupLayer"
+import { TileLayer } from "./layers/tile/TileLayer"
+import { MarkerLayer } from "./layers/marker/MarkerLayer"
+import { PopupLayer } from "./layers/popup/PopupLayer"
 
-import { Popup } from "./Popup"
-import { Marker } from "./wrapper/Marker"
+import { Popup } from "./layers/popup/Popup"
+import { Marker } from "./layers/marker/Marker"
 
 import { ZoomInteraction } from "./interactions/ZoomInteraction"
 import { HoverInteraction } from "./interactions/HoverInteraction"
@@ -14,11 +14,11 @@ import { ClickInteraction } from "./interactions/ClickInteraction"
 
 import style from "./style/glmap.css?raw"
 
-import { CircleLayer } from "../examples/circle-layer/CircleLayer"
-import { Circle } from "../examples/circle-layer/Circle"
+import { CircleLayer } from "./layers/circle/CircleLayer"
+import { Circle } from "./layers/circle/Circle"
 
-import { ArrowLayer } from "../examples/arrow-layer/ArrowLayer"
-import { Arrow } from "../examples/arrow-layer/Arrow"
+import { ArrowLayer } from "./layers/arrow/ArrowLayer"
+import { Arrow } from "./layers/arrow/Arrow"
 
 class SimpleGLMap extends GLMap {
 	tileLayer: TileLayer

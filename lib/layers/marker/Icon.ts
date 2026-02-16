@@ -1,4 +1,4 @@
-import { IconStorage } from "../storage/IconStorage"
+import { IconStorage } from "./IconStorage"
 
 // Wraps IconStorage functionality and hides internal slot-index
 class Icon {

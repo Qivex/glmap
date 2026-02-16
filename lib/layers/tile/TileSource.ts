@@ -1,4 +1,4 @@
-import type { Lookup } from "./types/types.ts"
+import type { Lookup } from "../../types/types.ts"
 
 type ParamLookupType = Lookup<any>
 

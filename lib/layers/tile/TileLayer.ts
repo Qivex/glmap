@@ -1,14 +1,14 @@
-import { MapLayer } from "./MapLayer.ts"
+import { MapLayer } from "../../MapLayer.ts"
 
-import { TileProgram } from "../programs/TileProgram.ts"
-import { TileSource } from "../TileSource.ts"
-import { TileStorage } from "../storage/TileStorage.ts"
-import { TilePosition } from "../types/TilePosition.ts"
+import { TileProgram } from "./TileProgram.ts"
+import { TileSource } from "./TileSource.ts"
+import { TileStorage } from "./TileStorage.ts"
+import { TilePosition } from "../../types/TilePosition.ts"
 
-import type { TileLayerConfig, TileBoundsType, QueueItemType } from "../types/types.ts"
-import type { CoordEvent } from "../events/CoordEvent.ts"
-import type { ZoomEvent } from "../events/ZoomEvent.ts"
-import type { ResizeEvent } from "../events/ResizeEvent.ts"
+import type { TileLayerConfig, TileBoundsType, QueueItemType } from "../../types/types.ts"
+import type { CoordEvent } from "../../events/CoordEvent.ts"
+import type { ZoomEvent } from "../../events/ZoomEvent.ts"
+import type { ResizeEvent } from "../../events/ResizeEvent.ts"
 
 
 function compareTileBounds(t1: TileBoundsType, t2: TileBoundsType) {

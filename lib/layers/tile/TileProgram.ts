@@ -1,13 +1,10 @@
-import { ShaderProgram } from "../../ShaderProgram"
+import { MapLayerProgram } from "../MapLayerProgram"
 
 import vs from "./shader/tile.vertex.glsl?raw"
 import fs from "./shader/tile.fragment.glsl?raw"
 
-class TileProgram extends ShaderProgram {
-	resolutionUniformLocation: WebGLUniformLocation | null
+class TileProgram extends MapLayerProgram {
 	tileSizeUniformLocation: WebGLUniformLocation | null
-	centerUniformLocation: WebGLUniformLocation | null
-	zoomUniformLocation: WebGLUniformLocation | null
 
 	vertexPosAttributeLocation: number
 	tilePosAttributeLocation: number
@@ -29,10 +26,7 @@ class TileProgram extends ShaderProgram {
 		let gl = context
 
 		// Cache uniform locations
-		this.resolutionUniformLocation = gl.getUniformLocation(this.program, "resolution")
 		this.tileSizeUniformLocation   = gl.getUniformLocation(this.program, "tileSize")
-		this.centerUniformLocation     = gl.getUniformLocation(this.program, "center")
-		this.zoomUniformLocation       = gl.getUniformLocation(this.program, "zoom")
 
 		// Store attributes
 		this.attributeArray = gl.createVertexArray()
@@ -65,20 +59,8 @@ class TileProgram extends ShaderProgram {
 	}
 
 	// Uniform setter
-	setResolution(width: number, height: number) {
-		this.context.uniform2f(this.resolutionUniformLocation, width, height)
-	}
-
 	setTileSize(width: number, height: number) {
 		this.context.uniform2f(this.tileSizeUniformLocation, width, height)
-	}
-
-	setCenter(x: number, y: number) {
-		this.context.uniform2f(this.centerUniformLocation, x, y)
-	}
-
-	setZoom(zoom: number) {
-		this.context.uniform1f(this.zoomUniformLocation, zoom)
 	}
 
 	// Attribute buffer setter

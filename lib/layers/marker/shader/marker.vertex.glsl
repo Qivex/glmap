@@ -3,9 +3,12 @@
 precision highp float;
 precision highp sampler2D;
 
-uniform vec2 resolution;
-uniform vec2 center;
-uniform float zoom;
+layout(std140) uniform MapLayer {
+	vec2 resolution;
+	vec2 center;
+	float zoom;
+};
+
 uniform sampler2D iconData;
 
 in vec2 vertexPos;

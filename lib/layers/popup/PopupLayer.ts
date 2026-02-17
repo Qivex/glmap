@@ -10,10 +10,6 @@ class PopupLayer extends MapLayer {
 	constructor(config: MapLayerConfig) {
 		super(config)
 
-		this.addEventListener("pan", this.updatePopupPositions as EventListener)
-		this.addEventListener("zoom", this.updatePopupPositions as EventListener)
-		this.addEventListener("resize", this.updatePopupPositions as EventListener)
-
 		// Clip resizing popups correctly
 		this.popupResizeObserver = new ResizeObserver((elems) => {
 			for (let el of elems) {
@@ -77,7 +73,10 @@ class PopupLayer extends MapLayer {
 		}
 	}
 
-	// No need to render, this layer just moves the popup elements
+	render() {
+		// Render implies modified state, therefore update
+		this.updatePopupPositions()
+	}
 }
 
 export { PopupLayer }

@@ -1,13 +1,9 @@
-import { ShaderProgram } from "../../ShaderProgram"
+import { MapLayerProgram } from "../MapLayerProgram"
 
 import vs from "./shader/marker.vertex.glsl?raw"
 import fs from "./shader/marker.fragment.glsl?raw"
 
-class MarkerProgram extends ShaderProgram {
-	resolutionUniformLocation: WebGLUniformLocation | null
-	centerUniformLocation: WebGLUniformLocation | null
-	zoomUniformLocation: WebGLUniformLocation | null
-
+class MarkerProgram extends MapLayerProgram {
 	vertexPosAttributeLocation: number
 	markerPosAttributeLocation: number
 	iconIndexAttributeLocation: number
@@ -26,11 +22,6 @@ class MarkerProgram extends ShaderProgram {
 		super(context)
 		this.compile(vs, fs)
 		let gl = context
-
-		// Cache uniform locations
-		this.resolutionUniformLocation = gl.getUniformLocation(this.program, "resolution")
-		this.centerUniformLocation     = gl.getUniformLocation(this.program, "center")
-		this.zoomUniformLocation       = gl.getUniformLocation(this.program, "zoom")
 
 		// Set texture units
 		this.activate()
@@ -65,19 +56,6 @@ class MarkerProgram extends ShaderProgram {
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.indexBuffer)
 		gl.vertexAttribPointer(this.iconIndexAttributeLocation, 1, gl.FLOAT, false, 0, 0)
 		gl.vertexAttribDivisor(this.iconIndexAttributeLocation, 1)
-	}
-
-	// Uniform setter
-	setResolution(width: number, height: number) {
-		this.context.uniform2f(this.resolutionUniformLocation, width, height)
-	}
-
-	setCenter(x: number, y: number) {
-		this.context.uniform2f(this.centerUniformLocation, x, y)
-	}
-
-	setZoom(zoom: number) {
-		this.context.uniform1f(this.zoomUniformLocation, zoom)
 	}
 
 	// Attribute buffer setter

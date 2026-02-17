@@ -1,15 +1,11 @@
-import { ShaderProgram } from "../../ShaderProgram"
+import { MapLayerProgram } from "../MapLayerProgram"
 
 import vs from "./shader/circle.vertex.glsl?raw"
 import fs from "./shader/circle.fragment.glsl?raw"
 
 import type { Circle } from "./Circle"
 
-class CircleProgram extends ShaderProgram {
-	resolutionUniformLocation: WebGLUniformLocation | null
-	centerUniformLocation: WebGLUniformLocation | null
-	zoomUniformLocation: WebGLUniformLocation | null
-
+class CircleProgram extends MapLayerProgram {
 	vertexPosAttributeLocation: number
 	circlePosAttributeLocation: number
 	radiusAttributeLocation: number
@@ -28,11 +24,6 @@ class CircleProgram extends ShaderProgram {
 		super(context)
 		this.compile(vs, fs)
 		let gl = context
-
-		// Cache uniform locations
-		this.resolutionUniformLocation = gl.getUniformLocation(this.program, "resolution")
-		this.centerUniformLocation     = gl.getUniformLocation(this.program, "center")
-		this.zoomUniformLocation       = gl.getUniformLocation(this.program, "zoom")
 
 		// Store attributes
 		this.attributeArray = gl.createVertexArray()
@@ -69,19 +60,6 @@ class CircleProgram extends ShaderProgram {
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuffer)
 		gl.vertexAttribPointer(this.colorAttributeLocation, 4, gl.FLOAT, false, 0, 0)
 		gl.vertexAttribDivisor(this.colorAttributeLocation, 1)
-	}
-
-	// Uniform setter
-	setResolution(width: number, height: number) {
-		this.context.uniform2f(this.resolutionUniformLocation, width, height)
-	}
-
-	setCenter(x: number, y: number) {
-		this.context.uniform2f(this.centerUniformLocation, x, y)
-	}
-
-	setZoom(zoom: number) {
-		this.context.uniform1f(this.zoomUniformLocation, zoom)
 	}
 
 	// Attribute buffer setter

@@ -4,10 +4,6 @@ import type { MapLayerConfig } from "../../types/types"
 import { Arrow } from "./Arrow"
 import { ArrowProgram } from "./ArrowProgram"
 
-import type { CoordEvent } from "../../events/CoordEvent"
-import type { ZoomEvent } from "../../events/ZoomEvent"
-import type { ResizeEvent } from "../../events/ResizeEvent"
-
 
 interface ArrowLayerConfig extends MapLayerConfig {
 	lineWidth?: number,
@@ -54,32 +50,9 @@ class ArrowLayer extends MapLayer {
 
 		// Initial state
 		ap.activate()
-		ap.setCenter(this.centerX, this.centerY)
-		ap.setZoom(this.zoom)
-		ap.setResolution(this.width, this.height)
 		ap.setLineWidth(lineWidth)
 		ap.setArrowPeriod(arrowPeriod)
 		ap.setArrowHead(arrowWidth, arrowHeight, arrowShape)
-
-		// React to state changes
-		this.addEventListener("pan", this.onPan as EventListener)
-		this.addEventListener("zoom", this.onZoom as EventListener)
-		this.addEventListener("resize", this.onResize as EventListener)
-	}
-
-	onPan(panEvent: CoordEvent) {
-		this.arrowProgram.activate()
-		this.arrowProgram.setCenter(panEvent.x, panEvent.y)
-	}
-
-	onZoom(zoomEvent: ZoomEvent) {
-		this.arrowProgram.activate()
-		this.arrowProgram.setZoom(zoomEvent.zoom)
-	}
-
-	onResize(resizeEvent: ResizeEvent) {
-		this.arrowProgram.activate()
-		this.arrowProgram.setResolution(resizeEvent.width, resizeEvent.height)
 	}
 
 	addArrow(arrow: Arrow) {

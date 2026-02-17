@@ -18,6 +18,8 @@ class GLMap extends CanvasContext {
 	resolutionWidth: number
 	resolutionHeight: number
 
+	uniformBuffer: WebGLBuffer | null
+
 	renderRequired = true
 
 	constructor(canvasElement: HTMLCanvasElement) {
@@ -27,6 +29,12 @@ class GLMap extends CanvasContext {
 		gl.clearColor(0, 0, 0, 0)
 		this.resolutionWidth = gl.drawingBufferWidth
 		this.resolutionHeight =  gl.drawingBufferHeight
+
+		// Shared uniform buffer object provides resolution, center & zoom to every MapLayer
+		this.uniformBuffer = gl.createBuffer()
+		gl.bindBuffer(gl.UNIFORM_BUFFER, this.uniformBuffer)
+		gl.bufferData(gl.UNIFORM_BUFFER, 20, gl.STATIC_DRAW)	// vec2 + vec2 + float = 20 bytes
+		gl.bindBufferBase(gl.UNIFORM_BUFFER, 0, this.uniformBuffer)
 
 		let render = (time: number) => {
 			this.render(time)
@@ -69,7 +77,7 @@ class GLMap extends CanvasContext {
 		if (x !== this.centerX || y !== this.centerY) {
 			this.centerX = x
 			this.centerY = y
-			this.dispatchEventToLayers(new CoordEvent("pan", {x, y}))
+			this.requireRender()
 		}
 	}
 
@@ -80,7 +88,7 @@ class GLMap extends CanvasContext {
 	setZoom(zoom: number) {
 		if (zoom !== this.zoom) {
 			this.zoom = zoom
-			this.dispatchEventToLayers(new ZoomEvent("zoom", {zoom}))
+			this.requireRender()
 		}
 	}
 
@@ -125,22 +133,27 @@ class GLMap extends CanvasContext {
 		if (w !== this.resolutionWidth || h !== this.resolutionHeight) {
 			this.resolutionWidth = w
 			this.resolutionHeight = h
-			this.dispatchEventToLayers(new ResizeEvent("resize", {width: w, height: h}))
+			this.requireRender()
 		}
 
 		// Skip rendering when idle
-		if (this.renderRequired === false) return
+		if (this.renderRequired === true) {
+			this.renderRequired = false
+			
+			console.log("render")
 
-		console.log("render")
+			// Update shared uniform buffer
+			gl.bindBuffer(gl.UNIFORM_BUFFER, this.uniformBuffer)
+			gl.bufferSubData(gl.UNIFORM_BUFFER, 0, new Float32Array([w, h, this.centerX, this.centerY, this.zoom]))
 
-		gl.viewport(0, 0, w, h)
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+			// Clear viewport
+			gl.viewport(0, 0, w, h)
+			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-		for (let layer of this.layers) {
-			layer.render(time)
+			for (let layer of this.layers) {
+				layer.render(time)
+			}
 		}
-
-		this.renderRequired = false
 	}
 }
 

@@ -4,10 +4,13 @@ precision highp float;
 
 const float MAX_LAYER_COUNT = 1024.0;
 
-uniform vec2 resolution;
+layout(std140) uniform MapLayer {
+	vec2 resolution;
+	vec2 center;
+	float zoom;
+};
+
 uniform vec2 tileSize;
-uniform vec2 center;
-uniform float zoom;
 
 in vec2 vertexPos;
 in vec3 tilePos;

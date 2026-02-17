@@ -1,14 +1,11 @@
-import { ShaderProgram } from "../../ShaderProgram"
+import { MapLayerProgram } from "../MapLayerProgram"
 
 import vs from "./shader/arrow.vertex.glsl?raw"
 import fs from "./shader/arrow.fragment.glsl?raw"
 
 import type { Arrow } from "./Arrow"
 
-class ArrowProgram extends ShaderProgram {
-	resolutionUniformLocation: WebGLUniformLocation | null
-	centerUniformLocation: WebGLUniformLocation | null
-	zoomUniformLocation: WebGLUniformLocation | null
+class ArrowProgram extends MapLayerProgram {
 	lineWidthUniformLocation: WebGLUniformLocation | null
 	headPeriodUnformLocation: WebGLUniformLocation | null
 	headWidthUniformLocation: WebGLUniformLocation | null
@@ -33,9 +30,6 @@ class ArrowProgram extends ShaderProgram {
 		let gl = context
 
 		// Cache uniform locations
-		this.resolutionUniformLocation = gl.getUniformLocation(this.program, "resolution")
-		this.centerUniformLocation     = gl.getUniformLocation(this.program, "center")
-		this.zoomUniformLocation       = gl.getUniformLocation(this.program, "zoom")
 		this.lineWidthUniformLocation  = gl.getUniformLocation(this.program, "lineWidth")
 		this.headPeriodUnformLocation  = gl.getUniformLocation(this.program, "headPeriod")
 		this.headWidthUniformLocation  = gl.getUniformLocation(this.program, "headWidth")
@@ -72,18 +66,6 @@ class ArrowProgram extends ShaderProgram {
 	}
 
 	// Uniform setter
-	setResolution(width: number, height: number) {
-		this.context.uniform2f(this.resolutionUniformLocation, width, height)
-	}
-
-	setCenter(x: number, y: number) {
-		this.context.uniform2f(this.centerUniformLocation, x, y)
-	}
-
-	setZoom(zoom: number) {
-		this.context.uniform1f(this.zoomUniformLocation, zoom)
-	}
-
 	setLineWidth(width: number) {
 		this.context.uniform1f(this.lineWidthUniformLocation, width)
 	}

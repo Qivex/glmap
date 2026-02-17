@@ -2,9 +2,11 @@
 
 precision highp float;
 
-uniform vec2 resolution;
-uniform vec2 center;
-uniform float zoom;
+layout(std140) uniform MapLayer {
+	vec2 resolution;
+	vec2 center;
+	float zoom;
+};
 
 in vec2 vertexPos;
 in vec2 circlePos;

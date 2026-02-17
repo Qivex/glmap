@@ -6,9 +6,6 @@ import { TileStorage } from "./TileStorage.ts"
 import { TilePosition } from "../../types/TilePosition.ts"
 
 import type { TileLayerConfig, TileBoundsType, QueueItemType } from "../../types/types.ts"
-import type { CoordEvent } from "../../events/CoordEvent.ts"
-import type { ZoomEvent } from "../../events/ZoomEvent.ts"
-import type { ResizeEvent } from "../../events/ResizeEvent.ts"
 
 
 function compareTileBounds(t1: TileBoundsType, t2: TileBoundsType) {
@@ -33,7 +30,6 @@ class TileLayer extends MapLayer {
 	tileSource: TileSource
 	tileStorage: TileStorage
 
-	hasUpdatedArea = false
 	hasUpdatedTiles = false
 
 	requiredTiles: Array<TilePosition> = []
@@ -45,10 +41,6 @@ class TileLayer extends MapLayer {
 
 	constructor(config: TileLayerConfig) {
 		super(config)
-
-		this.addEventListener("pan", this.onPan as EventListener)
-		this.addEventListener("zoom", this.onZoom as EventListener)
-		this.addEventListener("resize", this.onResize as EventListener)
 		
 		const {
 			context,
@@ -61,9 +53,8 @@ class TileLayer extends MapLayer {
 		} = config
 		Object.assign(this, {tileWidth, tileHeight, tileLimits, _tileFetchPadding, _tileCreationCountPerFrame})
 		
-		// Create tile source & force initial calculation + fetch
+		// Create tile source
 		this.tileSource = new TileSource(tileURL)
-		this.hasUpdatedArea = true
 
 		// Setup shader program
 		this.tileProgram = new TileProgram(context)
@@ -71,35 +62,11 @@ class TileLayer extends MapLayer {
 		tp.activate()
 		
 		// Set initial values before first render
-		tp.setCenter(this.centerX, this.centerY)
-		tp.setZoom(this.zoom)
-		tp.setResolution(this.width, this.height)
 		tp.setTileSize(this.tileWidth, this.tileHeight)
 
 		// Create texture storage for icons
 		this.tileStorage = new TileStorage(context, tileWidth, tileHeight)
 		tp.setTileTexture(this.tileStorage.getTextureBinding())
-	}
-
-	onPan(panEvent: CoordEvent) {
-		this.hasUpdatedArea = true
-
-		this.tileProgram.activate()
-		this.tileProgram.setCenter(panEvent.x, panEvent.y)
-	}
-
-	onZoom(zoomEvent: ZoomEvent) {
-		this.hasUpdatedArea = true
-
-		this.tileProgram.activate()
-		this.tileProgram.setZoom(zoomEvent.zoom)
-	}
-
-	onResize(resizeEvent: ResizeEvent) {
-		this.hasUpdatedArea = true
-
-		this.tileProgram.activate()
-		this.tileProgram.setResolution(resizeEvent.width, resizeEvent.height)
 	}
 
 	updateTileBounds(): boolean {
@@ -194,19 +161,14 @@ class TileLayer extends MapLayer {
 	}
 
 	render() {
-		if (this.hasUpdatedArea === true) {
-			this.hasUpdatedArea = false
 
-			let hasUpdatedBounds = this.updateTileBounds()
+		let hasUpdatedBounds = this.updateTileBounds()
 
-			if (hasUpdatedBounds === true) {
-				this.updateRequiredTiles()
-
-				this.tileStorage.removeTilesExceptRequired(this.requiredTiles)
-				this.hasUpdatedTiles = true	// Removing tiles must cause buffer update
-
-				this.fetchMissingTiles()
-			}
+		if (hasUpdatedBounds === true) {
+			this.updateRequiredTiles()
+			this.tileStorage.removeTilesExceptRequired(this.requiredTiles)
+			this.hasUpdatedTiles = true	// Removing tiles must cause buffer update
+			this.fetchMissingTiles()
 		}
 
 		// Draw all available tiles
@@ -219,10 +181,7 @@ class TileLayer extends MapLayer {
 			// Deep Dive: texSubImage3d acts synchronous on the GPU - only 1 buffer is written to the texture at any time
 			for (let i = 0; i < this._tileCreationCountPerFrame; i++) {
 				let queueItem = this.tileCreateQueue.pop()
-				if (queueItem === undefined) {
-					this.hasUpdatedTiles = false	// Only after queue has been emptied
-					break
-				}
+				if (queueItem === undefined) break
 
 				// Skip if no longer required (= when requiredTiles changed before download finished)
 				if (this.requiredTiles.some(tile => tile.equals(queueItem.tile)))
@@ -230,6 +189,11 @@ class TileLayer extends MapLayer {
 
 				this.pendingTileIDs.delete(queueItem.tile.toString())
 			}
+
+			if (this.tileCreateQueue.length > 0)
+				this.requireRender()	// Remaining tiles during next frame
+			else
+				this.hasUpdatedTiles = false
 
 			let {slices, positions} = this.tileStorage.constructBufferDataForTiles()
 			tp.setTileIndexes(slices)

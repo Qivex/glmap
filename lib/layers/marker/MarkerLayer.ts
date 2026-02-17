@@ -8,8 +8,6 @@ import { Icon } from "./Icon.ts"
 import type { Marker } from "./Marker.ts"
 
 import { CoordEvent } from "../../events/CoordEvent.ts"
-import type { ZoomEvent } from "../../events/ZoomEvent.ts"
-import type { ResizeEvent } from "../../events/ResizeEvent.ts"
 
 
 class MarkerLayer extends MapLayer {
@@ -36,9 +34,6 @@ class MarkerLayer extends MapLayer {
 
 		this.iconHitTest = iconHitTest
 
-		this.addEventListener("pan", this.onPan as EventListener)
-		this.addEventListener("zoom", this.onZoom as EventListener)
-		this.addEventListener("resize", this.onResize as EventListener)
 		this.addEventListener("click", this.onClick as EventListener)
 		this.addEventListener("hover", this.onHover as EventListener)
 
@@ -46,11 +41,6 @@ class MarkerLayer extends MapLayer {
 		this.markerProgram = new MarkerProgram(context)
 		let mp = this.markerProgram
 		mp.activate()
-
-		// Set initial values before first render
-		mp.setCenter(this.centerX, this.centerY)
-		mp.setZoom(this.zoom)
-		mp.setResolution(this.width, this.height)
 		
 		// Create texture storage for icons
 		this.iconStorage = new IconStorage(context, maxIconCount, maxIconWidth, maxIconHeight)
@@ -60,21 +50,6 @@ class MarkerLayer extends MapLayer {
 		// Create framebuffer to attach icon texture for alpha test
 		let gl = this.context
 		this.alphaTestFramebuffer = gl.createFramebuffer()
-	}
-
-	onPan(panEvent: CoordEvent) {
-		this.markerProgram.activate()
-		this.markerProgram.setCenter(panEvent.x, panEvent.y)
-	}
-
-	onZoom(zoomEvent: ZoomEvent) {
-		this.markerProgram.activate()
-		this.markerProgram.setZoom(zoomEvent.zoom)
-	}
-
-	onResize(resizeEvent: ResizeEvent) {
-		this.markerProgram.activate()
-		this.markerProgram.setResolution(resizeEvent.width, resizeEvent.height)
 	}
 
 	onClick(clickEvent: CoordEvent) {

@@ -1,7 +1,8 @@
+import { MapLayer } from "../../MapLayer"
 import type { ElementProgram } from "./ElementProgram"
 import type { MapElement } from "./MapElement"
 
-abstract class ElementLayer {
+abstract class ElementLayer extends MapLayer {
 	program: ElementProgram
 	elements: Set<MapElement> = new Set()
 	hasUpdatedElements = false
@@ -16,7 +17,12 @@ abstract class ElementLayer {
 		this.elements.delete(element)
 	}
 
-	renderElements() {
+	clearElements() {
+		this.hasUpdatedElements = true
+		this.elements.clear()
+	}
+
+	render() {
 		this.program.activate()
 
 		if (this.hasUpdatedElements === true) {

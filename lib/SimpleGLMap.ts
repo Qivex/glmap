@@ -114,7 +114,7 @@ class SimpleGLMap extends GLMap {
 		if (popupElement === null) return
 		let testPopup = new Popup(popupElement, 50, 25)
 
-		for (let marker of this.markerLayer.activeMarkers) {
+		for (let marker of this.markerLayer.getMarkers()) {
 			marker.addEventListener("click", () => {
 				this.popupLayer.removePopup(testPopup)
 				testPopup.element.childNodes[1].textContent = `${marker.x},${marker.y}`

@@ -1,7 +1,9 @@
+import { MapElement } from "../element/MapElement"
+
 import type { MarkerLayer } from "./MarkerLayer"
 import type { Icon } from "./Icon"
 
-class Marker extends EventTarget {
+class Marker extends MapElement {
 	x: number
 	y: number
 	icon: Icon
@@ -14,6 +16,10 @@ class Marker extends EventTarget {
 		this.x = x
 		this.y = y
 		this.icon = icon
+	}
+
+	serialize(): Array<number> {
+		return [this.x, this.y, this.icon.slot]
 	}
 
 	addTo(markerLayer: MarkerLayer) {

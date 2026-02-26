@@ -1,4 +1,4 @@
-import { MapLayer } from "../../MapLayer.ts"
+import { ElementLayer } from "../element/ElementLayer.ts"
 import { MarkerProgram } from "./MarkerProgram"
 import { IconStorage } from "./IconStorage.ts"
 
@@ -10,16 +10,11 @@ import type { Marker } from "./Marker.ts"
 import { CoordEvent } from "../../events/CoordEvent.ts"
 
 
-class MarkerLayer extends MapLayer {
-	markerProgram: MarkerProgram
+class MarkerLayer extends ElementLayer {
 	iconStorage: IconStorage
-
-	activeMarkers: Set<Marker> = new Set()
 
 	iconHitTest: IconHitTestType
 	alphaTestFramebuffer: WebGLFramebuffer | null
-
-	hasUpdatedMarkers = false
 
 	constructor(config: MarkerLayerConfig) {
 		super(config)
@@ -38,14 +33,14 @@ class MarkerLayer extends MapLayer {
 		this.addEventListener("hover", this.onHover as EventListener)
 
 		// Setup shader program
-		this.markerProgram = new MarkerProgram(context)
-		let mp = this.markerProgram
-		mp.activate()
+		let mp = new MarkerProgram(context)
+		this.program = mp
 		
 		// Create texture storage for icons
 		this.iconStorage = new IconStorage(context, maxIconCount, maxIconWidth, maxIconHeight)
-		mp.setMarkerTexture(this.iconStorage.getTextureBinding())	// Should never change
+		mp.activate()
 		mp.setIconDataTexture(this.iconStorage.getDataTextureBinding())
+		mp.setMarkerTexture(this.iconStorage.getTextureBinding())
 
 		// Create framebuffer to attach icon texture for alpha test
 		let gl = this.context
@@ -81,19 +76,25 @@ class MarkerLayer extends MapLayer {
 	}
 
 	addMarker(marker: Marker) {
-		this.hasUpdatedMarkers = true
-		this.activeMarkers.add(marker)
+		this.addElement(marker)
 	}
 
 	removeMarker(marker: Marker) {
-		this.hasUpdatedMarkers = true
-		this.activeMarkers.delete(marker)
+		this.removeElement(marker)
 	}
 
-	findClosestMarker(x: number, y: number) {
+	getMarkers() {
+		return this.elements as Set<Marker>
+	}
+
+	clearMarkers() {
+		this.clearElements()
+	}
+
+	findClosestMarker(x: number, y: number): Marker | null {
 		let closestMarker = null
 		let closestDistance = Infinity
-		for (let marker of this.activeMarkers) {
+		for (let marker of this.getMarkers()) {
 			let distance = Math.pow(x - marker.x, 2) + Math.pow(y - marker.y, 2)	// Omit sqrt until final result, doesnt change order
 			if (distance < closestDistance) {
 				closestDistance = distance
@@ -150,29 +151,6 @@ class MarkerLayer extends MapLayer {
 		gl.bindFramebuffer(gl.FRAMEBUFFER, null)
 		// Alpha test
 		return pixel[3] > 0
-	}
-
-	render(time: number) {
-		let mp = this.markerProgram
-		mp.activate()
-
-		// Only update program buffers at most once per draw call
-		if (this.hasUpdatedMarkers) {
-			this.hasUpdatedMarkers = false
-
-			let markerIcons = []
-			let markerLatLngs = []
-
-			for (let marker of this.activeMarkers) {
-				markerIcons.push(marker.icon.slot)
-				markerLatLngs.push(marker.x, marker.y)
-			}
-
-			mp.setMarkerIcons(markerIcons)
-			mp.setMarkerCoordinates(markerLatLngs)
-		}
-		
-		mp.draw()
 	}
 }
 

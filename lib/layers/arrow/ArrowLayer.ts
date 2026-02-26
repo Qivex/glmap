@@ -1,4 +1,4 @@
-import { MapLayer } from "../../MapLayer"
+import { ElementLayer } from "../element/ElementLayer"
 import type { MapLayerConfig } from "../../types/types"
 
 import { Arrow } from "./Arrow"
@@ -28,11 +28,7 @@ ctx.closePath()
 ctx.fill()
 
 
-class ArrowLayer extends MapLayer {
-	arrowProgram: ArrowProgram
-	arrows: Set<Arrow> = new Set()
-	hasUpdatedArrows = false
-
+class ArrowLayer extends ElementLayer {
 	constructor(config: ArrowLayerConfig) {
 		super(config)
 
@@ -45,8 +41,8 @@ class ArrowLayer extends MapLayer {
 			arrowShape = defaultArrow
 		} = config
 
-		this.arrowProgram = new ArrowProgram(context)
-		let ap = this.arrowProgram
+		let ap = new ArrowProgram(context)
+		this.program = ap
 
 		// Initial state
 		ap.activate()
@@ -56,25 +52,15 @@ class ArrowLayer extends MapLayer {
 	}
 
 	addArrow(arrow: Arrow) {
-		this.hasUpdatedArrows = true
-		this.arrows.add(arrow)
+		this.addElement(arrow)
 	}
 
 	removeArrow(arrow: Arrow) {
-		this.hasUpdatedArrows = true
-		this.arrows.delete(arrow)
+		this.removeElement(arrow)
 	}
 
-	render(time: number) {
-		this.arrowProgram.activate()
-
-		if (this.hasUpdatedArrows === true) {
-			this.hasUpdatedArrows = false
-			// Updates all buffers (will be slow for large amounts)
-			this.arrowProgram.setArrows(this.arrows)
-		}
-
-		this.arrowProgram.draw()
+	clearArrows() {
+		this.clearElements()
 	}
 }
 

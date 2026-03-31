@@ -32,7 +32,7 @@ class DataTexture {
 		if (tex === null)
 			throw new Error("Texture creation failed")
 		gl.bindTexture(gl.TEXTURE_2D, tex)
-		gl.texImage2D(gl.TEXTURE_2D, 0, this.internalFormat, this.width, this.height, 0, this.format, this.type, null)
+		gl.texStorage2D(gl.TEXTURE_2D, 1, this.internalFormat, this.width, this.height)
 		// Must be set to NEAREST: https://developer.mozilla.org/en-US/docs/Web/API/OES_texture_float#limitation_linear_filtering
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)

@@ -8,8 +8,8 @@ class TextureStorage {
 	texture: WebGLTexture
 
 	// Track slot usage
-	usedSlots: Array<boolean> = []
-	nextSlot = 0	// Points at lowest empty slot
+	slotFull: Array<boolean> = []
+	nextSlot = 0	// Lowest available slot
 
 	constructor(gl: WebGL2RenderingContext, maxWidth: number, maxHeight: number, maxCount: number) {
 		this.context = gl
@@ -29,7 +29,7 @@ class TextureStorage {
 		if (texture === null)
 			throw new Error("Texture creation failed")
 		gl.bindTexture(gl.TEXTURE_2D_ARRAY, texture)
-		gl.texImage3D(gl.TEXTURE_2D_ARRAY, 0, gl.RGBA, maxWidth, maxHeight, maxCount, 0, gl.RGBA, gl.UNSIGNED_BYTE, null)
+		gl.texStorage3D(gl.TEXTURE_2D_ARRAY, 1, gl.RGBA8, maxWidth, maxHeight, maxCount)
 		gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
 		gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 		gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
@@ -47,10 +47,10 @@ class TextureStorage {
 
 		let slot = this.nextSlot
 		this.updateTexture(slot, image)
-		this.usedSlots[slot] = true
+		this.slotFull[slot] = true
 
 		// Find next empty slot
-		while (this.usedSlots[this.nextSlot]) {
+		while (this.slotFull[this.nextSlot]) {
 			this.nextSlot++
 		}
 
@@ -64,7 +64,7 @@ class TextureStorage {
 	}
 
 	removeTexture(slot: number) {
-		this.usedSlots[slot] = false
+		this.slotFull[slot] = false
 
 		if (slot < this.nextSlot)
 			this.nextSlot = slot

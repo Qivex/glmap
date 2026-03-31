@@ -33,7 +33,7 @@ class GLMap extends CanvasContext {
 		// Shared uniform buffer object provides resolution, center & zoom to every MapLayer
 		this.uniformBuffer = gl.createBuffer()
 		gl.bindBuffer(gl.UNIFORM_BUFFER, this.uniformBuffer)
-		gl.bufferData(gl.UNIFORM_BUFFER, 20, gl.STATIC_DRAW)	// vec2 + vec2 + float = 20 bytes
+		gl.bufferData(gl.UNIFORM_BUFFER, 20, gl.DYNAMIC_DRAW)	// vec2 + vec2 + float = 20 bytes
 		gl.bindBufferBase(gl.UNIFORM_BUFFER, 0, this.uniformBuffer)
 
 		let render = (time: number) => {

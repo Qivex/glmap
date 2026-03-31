@@ -9,7 +9,6 @@ class ArrowProgram extends ElementProgram {
 	headWidthUniformLocation: WebGLUniformLocation | null
 	headHeightUniformLocation: WebGLUniformLocation | null
 
-	arrowCount = 0
 	texture: WebGLTexture
 
 	constructor(context: WebGL2RenderingContext) {

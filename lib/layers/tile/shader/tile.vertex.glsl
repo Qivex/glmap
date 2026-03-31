@@ -13,7 +13,8 @@ layout(std140) uniform MapLayer {
 uniform vec2 tileSize;
 
 in vec2 vertexPos;
-in vec3 tilePos;
+in vec2 tilePos;
+in float tileZoom;
 in float tileIndex;
 
 out vec2 uv;
@@ -24,10 +25,10 @@ void main() {
 	uv = vertexPos;
 	w = tileIndex;
 	// Vertex position
-	float tileScale = pow(2.0, zoom - tilePos.z);   // Scaling for tiles of other zoom
-	vec2 gridPos = (tilePos.xy + vertexPos) * tileScale; // Location on the grid
-	vec2 gridOffset = center * pow(2.0, zoom);      // Offset of the entire grid
+	float tileScale = pow(2.0, zoom - tileZoom); // Scaling for tiles of other zoom
+	vec2 gridPos = (tilePos + vertexPos) * tileScale; // Location on the grid
+	vec2 gridOffset = center * pow(2.0, zoom);   // Offset of the entire grid
 	vec2 pixelPos = gridPos * tileSize - gridOffset;
 	vec2 normalized = pixelPos * vec2(2, -2) / resolution;
-	gl_Position = vec4(normalized, 0.99999 - tilePos.z / MAX_LAYER_COUNT, 1);
+	gl_Position = vec4(normalized, 0.99999 - tileZoom / MAX_LAYER_COUNT, 1);
 }

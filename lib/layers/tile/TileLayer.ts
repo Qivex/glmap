@@ -195,9 +195,7 @@ class TileLayer extends MapLayer {
 			else
 				this.hasUpdatedTiles = false
 
-			let {slices, positions} = this.tileStorage.constructBufferDataForTiles()
-			tp.setTileIndexes(slices)
-			tp.setTilePositions(positions)
+			tp.setElements(this.tileStorage.getTiles())
 		}
 
 		tp.draw()

@@ -1,4 +1,5 @@
 import { TextureStorage } from "../../TextureStorage"
+import { Tile } from "./Tile"
 
 import type { TilePosition } from "../../types/TilePosition"
 
@@ -29,19 +30,12 @@ class TileStorage extends TextureStorage {
 		})
 	}
 
-	constructBufferDataForTiles(): {slices: Array<number>, positions: Array<number>} {
-		let slices: Array<number> = [],
-			positions: Array<number> = []
-		
-		this.tilePositions.forEach((p, slot) => {
-			slices.push(slot)
-			positions.push(p.x, p.y, p.z)
-		})
-
-		return {
-			slices,
-			positions
-		}
+	getTiles() {
+		return new Set(
+			this.tilePositions
+			.map((p, slot) => new Tile(p.x, p.y, p.z, slot))
+			.filter(t => t !== undefined)
+		)
 	}
 }
 

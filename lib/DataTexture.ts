@@ -1,6 +1,6 @@
 /**
- * Used to move data to a shader when:
- * a) Data length varies (uniform arrays have fixed length) or
+ * Improvised SSBO. Used to move data to a shader when:
+ * a) Data length varies (uniform arrays have fixed length) AND
  * b) An attribute array would contain a lot of redundant data (expensive buffer transfer on every frame)
  */
 class DataTexture {
@@ -43,11 +43,10 @@ class DataTexture {
 		return this.texture
 	}
 
-	setData(index: number, data: Array<number>, offset?: number) {
+	setData(index: number, data: Array<number>, offset: number = 0) {
 		if (index < 0 || index > this.height)
 			throw new Error("Index out of range!")
 
-		offset = offset || 0
 		let length = data.length
 
 		if (offset + length > this.width)

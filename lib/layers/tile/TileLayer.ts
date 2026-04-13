@@ -196,6 +196,7 @@ class TileLayer extends MapLayer {
 				this.hasUpdatedTiles = false
 
 			tp.setElements(this.tileStorage.getTiles())
+			tp.setTileTexture(this.tileStorage.getTextureBinding())	// TextureStorage.expand() might have changed the texture
 		}
 
 		tp.draw()

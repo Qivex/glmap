@@ -69,9 +69,16 @@ class TileLayer extends MapLayer {
 
 	updateTileBounds(): boolean {
 		let zoomLevel = Math.floor(this.zoom + 0.5)
+		
+		if (this.tileLimits) {
+			if (zoomLevel < this.tileLimits.minZoom)
+				zoomLevel = Math.ceil(this.tileLimits.minZoom)
+			if (zoomLevel > this.tileLimits.maxZoom)
+				zoomLevel = Math.floor(this.tileLimits.maxZoom)
+		}
 
 		let doubledViewScale = Math.pow(2, this.zoom + 1)
-		
+
 		let halfWidth  = this.width  / doubledViewScale,
 			halfHeight = this.height / doubledViewScale
 

@@ -25,7 +25,6 @@ interface TileLayerConfig extends MapLayerConfig {
 	tileHeight?: number,
 	tileURL: string,
 	tileLimits?: TileBoundsType,
-	_tileFetchPadding?: number,
 	_tileCreationCountPerFrame?: number
 }
 

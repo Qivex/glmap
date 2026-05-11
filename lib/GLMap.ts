@@ -1,8 +1,6 @@
 import { CanvasContext } from "./CanvasContext"
 
 import { CoordEvent } from "./events/CoordEvent"
-import { ResizeEvent } from "./events/ResizeEvent"
-import { ZoomEvent } from "./events/ZoomEvent"
 
 import type { UserInteraction } from "./interactions/UserInteraction"
 import type { MapLayer } from "./MapLayer"

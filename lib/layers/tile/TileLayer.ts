@@ -23,7 +23,6 @@ class TileLayer extends MapLayer {
 	tileHeight = 256
 
 	// Experimental settings
-	_tileFetchPadding = 0	// Fetch tiles outside of visible viewport to avoid missing tiles
 	_tileCreationCountPerFrame = 8	// Limit tile creation to avoid texture upload bottleneck
 
 	tileProgram: TileProgram
@@ -48,10 +47,9 @@ class TileLayer extends MapLayer {
 			tileHeight = 256,
 			tileURL,
 			tileLimits,
-			_tileFetchPadding = 0,
 			_tileCreationCountPerFrame = 8
 		} = config
-		Object.assign(this, {tileWidth, tileHeight, tileLimits, _tileFetchPadding, _tileCreationCountPerFrame})
+		Object.assign(this, {tileWidth, tileHeight, tileLimits, _tileCreationCountPerFrame})
 		
 		// Create tile source
 		this.tileSource = new TileSource(tileURL)
@@ -72,22 +70,16 @@ class TileLayer extends MapLayer {
 	updateTileBounds(): boolean {
 		let zoomLevel = Math.floor(this.zoom + 0.5)
 
-		if (this.tileLimits) {
-			if (zoomLevel < this.tileLimits.minZoom) zoomLevel = Math.ceil(this.tileLimits.minZoom)
-			if (zoomLevel > this.tileLimits.maxZoom) zoomLevel = Math.floor(this.tileLimits.maxZoom)
-		}
-
-		let viewScale = Math.pow(2, this.zoom)
-
-		// Add padding to viewport
-		let paddedWidth  = (this.width  / 2 + this._tileFetchPadding) / viewScale,
-			paddedHeight = (this.height / 2 + this._tileFetchPadding) / viewScale
+		let doubledViewScale = Math.pow(2, this.zoom + 1)
+		
+		let halfWidth  = this.width  / doubledViewScale,
+			halfHeight = this.height / doubledViewScale
 
 		let requiredArea = {
-			minX: this.centerX - paddedWidth,
-			maxX: this.centerX + paddedWidth,
-			minY: this.centerY - paddedHeight,
-			maxY: this.centerY + paddedHeight,
+			minX: this.centerX - halfWidth,
+			maxX: this.centerX + halfWidth,
+			minY: this.centerY - halfHeight,
+			maxY: this.centerY + halfHeight,
 			minZoom: 0,
 			maxZoom: zoomLevel
 		}
@@ -107,7 +99,7 @@ class TileLayer extends MapLayer {
 		// Convert to grid coordinates
 		let gridScale = Math.pow(2, zoomLevel)
 		let horizontalGridScale = gridScale / this.tileWidth
-		let verticalGridScale = gridScale / this.tileHeight
+		let verticalGridScale   = gridScale / this.tileHeight
 
 		requiredArea.minX = Math.floor(requiredArea.minX * horizontalGridScale)
 		requiredArea.maxX = Math.floor(requiredArea.maxX * horizontalGridScale)
@@ -119,7 +111,7 @@ class TileLayer extends MapLayer {
 		} else {
 			this.tileBounds = requiredArea
 			let r = requiredArea
-			console.log(`New Bounds: ${r.maxX-r.minX+1}x${r.maxY-r.minY+1} -> X: ${r.minX}-${r.maxX} & Y: ${r.minY}-${r.maxY}`)
+			console.log(`New Bounds: ${r.maxX-r.minX+1}x${r.maxY-r.minY+1} -> X: ${r.minX}-${r.maxX} & Y: ${r.minY}-${r.maxY} & Zoom: ${r.minZoom}-${r.maxZoom}`)
 			return true
 		}
 	}

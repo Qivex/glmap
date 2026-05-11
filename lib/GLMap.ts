@@ -52,8 +52,6 @@ class GLMap extends CanvasContext {
 	}
 
 	dispatchEventToLayers(event: Event) {
-		// Assume all events require re-render except HoverEvent
-		if (event.type !== "hover") this.requireRender()
 		// Reverse order because top layer is (rendered) last
 		for (let layer of this.layers.toReversed()) {
 			let shouldPropagate = layer.dispatchEvent(event)

@@ -14,9 +14,11 @@ uniform sampler2D iconData;
 in vec2 vertexPos;
 in vec2 markerPos;
 in float iconIndex;
+in vec4 iconColor;
 
 out vec2 uv;
 out float w;
+out vec4 rgba;
 
 float fetchData(int offset) {
 	return texelFetch(iconData, ivec2(offset, iconIndex), 0).r;
@@ -26,6 +28,8 @@ void main() {
 	// Texture coordinates
 	uv = vertexPos;
 	w = iconIndex;
+	// Unpack color
+	rgba = iconColor;
 	// Unpack icon data from texture
 	vec2 iconSize = vec2(fetchData(0), fetchData(1));
 	vec2 iconAnchor = vec2(fetchData(2), fetchData(3));

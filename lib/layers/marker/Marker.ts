@@ -6,16 +6,18 @@ class Marker extends MapElement {
 	x: number
 	y: number
 	icon: Icon
+	rgba: [number,number,number,number]
 
-	constructor(x: number, y: number, icon: Icon) {
+	constructor(x: number, y: number, icon: Icon, rgba: [number,number,number,number]) {
 		super()
 		this.x = x
 		this.y = y
 		this.icon = icon
+		this.rgba = rgba
 	}
 
 	serialize(): Array<number> {
-		return [this.x, this.y, this.icon.slot]
+		return [this.x, this.y, this.icon.slot, ...this.rgba]
 	}
 }
 

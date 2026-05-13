@@ -19,7 +19,8 @@ class MarkerProgram extends ElementProgram {
 		this.initDefaultMesh()
 		this.initElementAttributes([
 			{name: "markerPos", length: 2},
-			{name: "iconIndex", length: 1}
+			{name: "iconIndex", length: 1},
+			{name: "iconColor", length: 4}
 		])
 
 		// Set texture units

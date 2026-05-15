@@ -60,6 +60,9 @@ interface ZoomEventInit extends EventInit {
 	zoom: number
 }
 
+type Point = [number, number]
+type Color = [number, number, number, number]
+
 
 
 export type {
@@ -75,5 +78,8 @@ export type {
 
 	CoordEventInit,
 	ResizeEventInit,
-	ZoomEventInit
+	ZoomEventInit,
+
+	Point,
+	Color
 }

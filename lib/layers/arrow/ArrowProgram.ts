@@ -29,7 +29,7 @@ class ArrowProgram extends ElementProgram {
 		this.initDefaultMesh()
 		this.initElementAttributes([
 			{name: "arrowCoords", length: 4},
-			{name: "color", length: 4}
+			{name: "color", length: 4, format: gl.UNSIGNED_BYTE}
 		])
 	}
 

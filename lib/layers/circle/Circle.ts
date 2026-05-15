@@ -1,31 +1,24 @@
 import { MapElement } from "../element/MapElement"
 
-type Point = [number, number]
-type Color = [number, number, number, number]
-
-type CircleInfo = {
-	center: Point,
-	radius: number,
-	color?: Color
-}
+import type { Color } from "../../types/types"
 
 class Circle extends MapElement {
-	center: Point
+	serialized: Uint8Array
+
+	x: number
+	y: number
 	radius: number
 	color: Color
 
-	constructor(config: CircleInfo) {
+	constructor(x: number, y: number, radius: number, color: Color) {
 		super()
-		const {
-			center,
-			radius,
-			color = [0, 0, 0, 1]
-		} = config
-		Object.assign(this, {center, radius, color})
-	}
 
-	serialize(): Array<number> {
-		return [...this.center, this.radius, ...this.color]
+		let serialized = new Uint8Array(16)
+		new Float32Array(serialized.buffer).set([x, y, radius])
+		serialized.set(color, 12)
+
+		Object.assign(this, {serialized, x, y, radius, color})
+		Object.freeze(this)
 	}
 }
 

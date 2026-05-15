@@ -18,7 +18,8 @@ out vec4 rgba;
 
 void main() {
 	uv = vertexPos;
-	rgba = color;
+	// Normalize color
+	rgba = color / 256.0;
 	// Vertex position
 	vec2 centerOffset = (circlePos - center) * pow(2.0, zoom);
 	vec2 cornerOffset = (2.0 * radius * vertexPos - vec2(radius, radius)) * pow(2.0, zoom);	// Remove pow-factor for fixed size (like markers)

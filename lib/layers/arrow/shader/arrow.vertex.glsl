@@ -23,7 +23,7 @@ out float arrowLength;
 void main() {
 	// Common varyings
 	uv = vertexPos;
-	rgba = color;
+	rgba = color / 256.0;
 	// Line thickness
 	float uvLineHalf = 0.5 * lineWidth / headWidth;
 	lineInterval = vec2(0.5 - uvLineHalf,0.5 + uvLineHalf);

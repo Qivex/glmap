@@ -1,31 +1,23 @@
 import { MapElement } from "../element/MapElement"
 
-type Point = [number, number]
-type Color = [number, number, number, number]
-
-type ArrowInfo = {
-	startPoint: Point,
-	endPoint: Point,
-	color?: Color
-}
+import type { Point, Color } from "../../types/types"
 
 class Arrow extends MapElement {
+	serialized: Uint8Array
+
 	startPoint: Point
 	endPoint: Point
 	color: Color
 
-	constructor(config: ArrowInfo) {
+	constructor(startPoint: Point, endPoint: Point, color: Color) {
 		super()
-		const {
-			startPoint,
-			endPoint,
-			color = [0, 0, 0, 1]
-		} = config
-		Object.assign(this, {startPoint, endPoint, color})
-	}
+		
+		let serialized = new Uint8Array(20)
+		new Float32Array(serialized.buffer).set([startPoint[0], startPoint[1], endPoint[0], endPoint[1]])
+		serialized.set(color, 16)
 
-	serialize(): Array<number> {
-		return [...this.startPoint, ...this.endPoint, ...this.color]
+		Object.assign(this, {serialized, startPoint, endPoint, color})
+		Object.freeze(this)
 	}
 }
 

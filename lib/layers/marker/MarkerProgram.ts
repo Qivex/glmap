@@ -20,7 +20,7 @@ class MarkerProgram extends ElementProgram {
 		this.initElementAttributes([
 			{name: "markerPos", length: 2},
 			{name: "iconIndex", length: 1},
-			{name: "iconColor", length: 4}
+			{name: "iconColor", length: 4, format: gl.UNSIGNED_BYTE}
 		])
 
 		// Set texture units

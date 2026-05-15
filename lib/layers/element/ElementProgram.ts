@@ -1,6 +1,9 @@
 import { MapLayerProgram } from "../MapLayerProgram"
 import type { MapElement } from "./MapElement"
 
+type vectorSize = 1|2|3|4
+type dataFormat = WebGLRenderingContextBase["BYTE"|"SHORT"|"UNSIGNED_BYTE"|"UNSIGNED_SHORT"|"FLOAT"]
+
 abstract class ElementProgram extends MapLayerProgram {
 	attributeArray: WebGLVertexArrayObject | null	// Into parent?
 
@@ -20,29 +23,42 @@ abstract class ElementProgram extends MapLayerProgram {
 		// Fill buffer data
 		let buffer = gl.createBuffer()
 		gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
-		gl.vertexAttribPointer(location, 2, gl.FLOAT, false, 0, 0)
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0,0, 0,1, 1,0, 1,1]), gl.STATIC_DRAW)
+		gl.vertexAttribPointer(location, 2, gl.UNSIGNED_BYTE, false, 0, 0)
+		gl.bufferData(gl.ARRAY_BUFFER, new Uint8Array([0,0, 0,1, 1,0, 1,1]), gl.STATIC_DRAW)
 	}
 
 	// Define layout of attributes in elementBuffer
-	initElementAttributes(attributes: Array<{name: string, length: number}>) {
+	initElementAttributes(attributes: Array<{name: string, length: vectorSize, format?: dataFormat}>) {
+		let gl = this.context
+		function getByteLength(format?: dataFormat) {
+			switch(format) {
+				case gl.BYTE:
+				case gl.UNSIGNED_BYTE:
+					return 1
+				case gl.SHORT:
+				case gl.UNSIGNED_SHORT:
+					return 2
+				case gl.FLOAT:
+				default:
+					return 4
+			}
+		}
 		// Total length of attributes = stride
 		let stride = 0
 		for (let a of attributes) {
-			stride += a.length
+			stride += a.length * getByteLength(a.format)
 		}
 		// Create buffer
-		let gl = this.context
 		let buffer = gl.createBuffer()
 		gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
-		// Consecutive attributes in buffer
+		// Attributes are tightly packed in buffer
 		let offset = 0
 		for (let a of attributes) {
 			let location = gl.getAttribLocation(this.program, a.name)
 			gl.enableVertexAttribArray(location)
-			gl.vertexAttribPointer(location, a.length, gl.FLOAT, false, 4*stride, 4*offset)
+			gl.vertexAttribPointer(location, a.length, a.format? a.format : gl.FLOAT, false, stride, offset)
 			gl.vertexAttribDivisor(location, 1)	// Buffer data once per instance (instead of per vertex)
-			offset += a.length
+			offset += a.length * getByteLength(a.format)
 		}
 		console.assert(offset == stride)
 		this.elementBuffer = buffer
@@ -50,15 +66,26 @@ abstract class ElementProgram extends MapLayerProgram {
 
 	setElements(elements: Set<MapElement>) {
 		this.elementCount = elements.size
-		// Serialize attribute data of each element
-		let data = []
-		for (let el of elements) {
-			data.push(...el.serialize())
+
+		for (let first of elements) {
+			// Initialize array to avoid resize
+			let stride = first.serialized.byteLength
+			let data = new Uint8Array(elements.size * stride)
+
+			// Concat all serialized elements
+			let offset = 0
+			for (let el of elements) {
+				data.set(el.serialized, offset)
+				offset += stride
+			}
+
+			// Upload data to buffer
+			let gl = this.context
+			gl.bindBuffer(gl.ARRAY_BUFFER, this.elementBuffer)
+			gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW)
+
+			break
 		}
-		// Upload to buffer
-		let gl = this.context
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.elementBuffer)
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW)
 	}
 
 	draw() {

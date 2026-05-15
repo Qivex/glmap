@@ -91,13 +91,13 @@ class SimpleGLMap extends GLMap {
 
 		// Get colors
 		let colors: Array<[number,number,number,number]> = [
-			[1,0,0,1],
-			[0,1,0,1],
-			[0,0,1,1],
-			[1,1,0,1],
-			[1,0,1,1],
-			[0,1,1,1],
-			[0,0,0,1]
+			[255,  0,  0,255],
+			[  0,255,  0,255],
+			[  0,  0,255,255],
+			[255,255,  0,255],
+			[255,  0,255,255],
+			[  0,255,255,255],
+			[  0,  0,  0,255]
 		]
 
 		// Dropped frames above 128x256
@@ -138,7 +138,7 @@ class SimpleGLMap extends GLMap {
 		})
 		this.addMapLayer(this.circleLayer)
 
-		this.circleLayer.addCircle(new Circle({center: [64,128], radius: 5, color: [1,1,0,0.2]}))
+		this.circleLayer.addCircle(new Circle(64, 128, 5, [255,255,0,50]))
 	}
 
 	testArrow() {
@@ -148,8 +148,8 @@ class SimpleGLMap extends GLMap {
 		})
 		this.addMapLayer(this.arrowLayer)
 
-		this.arrowLayer.addArrow(new Arrow({startPoint: [64,128], endPoint: [72,130], color: [1,1,1,1]}))
-		this.arrowLayer.addArrow(new Arrow({startPoint: [70,120], endPoint: [77,137], color: [0,1,0,1]}))
+		this.arrowLayer.addArrow(new Arrow([64,128], [72,130], [255,255,255,255]))
+		this.arrowLayer.addArrow(new Arrow([70,120], [77,137], [  0,255,  0,255]))
 	}
 
 	testZooming() {

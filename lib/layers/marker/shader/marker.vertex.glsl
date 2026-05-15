@@ -28,8 +28,8 @@ void main() {
 	// Texture coordinates
 	uv = vertexPos;
 	w = iconIndex;
-	// Unpack color
-	rgba = iconColor;
+	// Normalize color
+	rgba = iconColor / 256.0;
 	// Unpack icon data from texture
 	vec2 iconSize = vec2(fetchData(0), fetchData(1));
 	vec2 iconAnchor = vec2(fetchData(2), fetchData(3));

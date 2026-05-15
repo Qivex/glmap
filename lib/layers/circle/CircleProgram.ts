@@ -17,7 +17,7 @@ class CircleProgram extends ElementProgram {
 		this.initElementAttributes([
 			{name: "circlePos", length: 2},
 			{name: "radius", length: 1},
-			{name: "color", length: 4}
+			{name: "color", length: 4, format: gl.UNSIGNED_BYTE}
 		])
 	}
 }

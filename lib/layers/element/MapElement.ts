@@ -1,6 +1,9 @@
 abstract class MapElement extends EventTarget {
-	// Serialize according to attribute structure of elementBuffer
-	abstract serialize(): Array<number>
+	// Serialized according to attribute structure of elementBuffer (for use in bufferData)
+	abstract serialized: Uint8Array
+
+	// TODO: static attributes
+	// For use in initElementAttributes(MapElement.attributes)
 }
 
 export { MapElement }
